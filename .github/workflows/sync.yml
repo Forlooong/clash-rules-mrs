@@ -1,61 +1,54 @@
 name: Sync and Build MRS Rulesets
-
 on:
   schedule:
-    # 每天北京时间 07:00 (UTC 23:00) 定时触发（上游 06:30 完成更新）
     - cron: '0 23 * * *'
+  push:
+    branches: [main]
+    paths: ['personal/**', 'scripts/**', 'tests/**', '.github/workflows/sync.yml']
   workflow_dispatch:
-
 permissions:
   contents: write
-
+concurrency:
+  group: publish-mrs
+  cancel-in-progress: false
 jobs:
   build:
-    name: Convert and Publish MRS
     runs-on: ubuntu-latest
-
+    timeout-minutes: 30
     steps:
-      - name: Set variables
-        run: |
-          echo "RELEASE_NAME=Released on $(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
-          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Mihomo Core
-        run: |
-          # 使用 GITHUB_TOKEN 避免未鉴权 API 速率限制 (Rate Limit)
-          MIHOMO_URL=$(curl -fsSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | grep "browser_download_url.*linux-amd64-compatible" | grep -v "v3" | cut -d '"' -f 4 | head -n 1)
-          if [ -z "$MIHOMO_URL" ]; then
-            MIHOMO_URL=$(curl -fsSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/MetaCubeX/mihomo/releases/latest | grep "browser_download_url.*linux-amd64" | head -n 1 | cut -d '"' -f 4)
-          fi
-          echo "Downloading Mihomo from: $MIHOMO_URL"
-          curl -fsSL -o mihomo.gz "$MIHOMO_URL"
-          gzip -d mihomo.gz
-          chmod +x mihomo
-          sudo mv mihomo /usr/local/bin/mihomo
-          mihomo -v
-
-      - name: Convert Rulesets
-        run: |
-          chmod +x scripts/build.sh
-          ./scripts/build.sh
-
-      - name: Release and upload assets
-        uses: softprops/action-gh-release@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          name: ${{ env.RELEASE_NAME }}
-          tag_name: ${{ env.TAG_NAME }}
-          draft: false
-          prerelease: false
-          files: |
-            ./out/**/*.mrs
+          python-version: '3.12'
+      - name: Dependencies
+        run: python3 -m pip install 'PyYAML==6.0.2'
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Install Mihomo
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy to release branch
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIHOMO_TAG: v1.19.32
+        run: |
+          set -euo pipefail
+          json="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/MetaCubeX/mihomo/releases/tags/$MIHOMO_TAG")"
+          url="$(jq -r '[.assets[].browser_download_url | select(test("linux-amd64-compatible.*\\.gz$"))][0] // empty' <<<"$json")"
+          if [ -z "$url" ]; then
+            url="$(jq -r '[.assets[].browser_download_url | select(test("linux-amd64.*\\.gz$"))][0] // empty' <<<"$json")"
+          fi
+          test -n "$url"
+          curl -fsSL --retry 3 -o mihomo.gz "$url"
+          gzip -t mihomo.gz
+          gzip -dc mihomo.gz > mihomo
+          sudo install -m 0755 mihomo /usr/local/bin/mihomo
+          mihomo -v
+      - name: Build and smoke test
+        run: |
+          set -euo pipefail
+          bash scripts/build.sh
+          test "$(find out/loyalsoldier -maxdepth 1 -name '*.mrs' | wc -l)" -eq 13
+          mihomo -t -d "$PWD" -f out/smoke.yaml
+          cat out/personal/build-report.json
+      - name: Publish release branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -63,12 +56,14 @@ jobs:
           publish_dir: ./out
           keep_files: false
           force_orphan: true
-
-      - name: Purge jsdelivr CDN cache
-        run: |
-          cd out || exit 1
-          find . -type f -name "*.mrs" | while read -r file; do
-            clean_path="${file#./}"
-            echo "Purging CDN cache for: $clean_path"
-            curl -s -i "https://purge.jsdelivr.net/gh/${{ github.repository }}@release/${clean_path}" > /dev/null 2>&1 || true
-          done
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MRS build ${{ github.run_id }}
+          tag_name: build-${{ github.run_id }}-${{ github.run_attempt }}
+          files: |
+            out/loyalsoldier/*.mrs
+            out/personal/*.mrs
+            out/personal/*.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
