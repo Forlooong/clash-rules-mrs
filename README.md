@@ -1,189 +1,59 @@
-# clash-rules-mrs
+# Forlooong Clash/Mihomo MRS 规则仓库
 
-基于 [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules) 纯文本规则集，每日定时同步并编译为 **Mihomo (Clash.Meta)** 原生二进制规则集（`.mrs` 格式）。
+基于 [CRThu/clash-rules-mrs](https://github.com/CRThu/clash-rules-mrs) 的 Fork，继续转换 [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)，同时在本仓库维护个人规则。请勿将包含节点密钥或订阅 Token 的完整 Clash YAML 提交到本公开仓库。
 
-## 特性
+## 编辑私人规则
 
-- **二进制编译**：体积缩减 60% ~ 80%，降低内存占用与解析耗时。
-- **每日同步**：GitHub Actions 于北京时间每日 07:00（UTC 23:00）自动拉取上游规则并构建。
-- **结构规范**：源码保存在 `raw/<source>/`，构建产物输出至 `out/<source>/`。
+- [`personal/direct.yaml`](personal/direct.yaml)：强制直连。
+- [`personal/proxy.yaml`](personal/proxy.yaml)：强制代理。
 
----
+规则格式仍为 Mihomo classical YAML，例如：
 
-## 推荐配置（白名单：绕过大陆模式）
+```yaml
+payload:
+  - DOMAIN,login.example.com
+  - DOMAIN-SUFFIX,example.org
+  - IP-CIDR,203.0.113.0/24,no-resolve
+```
 
-适用于绝大多数“国内流量直连、其余流量走代理”的分流场景：
+个人规则从 [Forlooong/personal-clash-rules](https://github.com/Forlooong/personal-clash-rules) 初次迁移；此后应在新 Fork 编辑，不再自动读取旧仓库。当前两份源文件只含 `payload: ['']` 空占位符，**没有实际私人规则，因此不会发布空的私人 MRS**。
+
+## 构建产物
+
+- 13 个 Loyalsoldier MRS：`release/loyalsoldier/{reject,icloud,apple,google,proxy,direct,private,gfw,greatfire,tld-not-cn,telegramcidr,cncidr,lancidr}.mrs`；其中前 10 个为 `domain`，后 3 个为 `ipcidr`。
+- 原版 `applications.txt` 是 classical 格式，发布为 `release/loyalsoldier/applications.yaml`，不能强行转为 MRS。
+- 有对应规则才生成 `release/personal/personal-direct-domain.mrs`、`personal-direct-ipcidr.mrs`、`personal-proxy-domain.mrs`、`personal-proxy-ipcidr.mrs`。
+- `no-resolve`、关键词、正则、进程、端口及其他不可无损转换的私人规则，保留为 `release/personal/personal-{direct,proxy}-classical.yaml`，不会静默丢弃。
+- 构建还输出 `release/manifest.json`、`release/clash-snippet.yaml` 和 `release/personal/build-report.json`。
+
+## 自动构建
+
+[Sync and Build MRS Rulesets](https://github.com/Forlooong/clash-rules-mrs/actions/workflows/sync.yml) 每日 UTC 23:00（北京时间次日 07:00）计划运行；修改私人规则、构建脚本、测试或工作流时自动触发，也可以使用 Run workflow。GitHub 计划任务可能延迟。
+
+Fork 默认可能停用 Actions：打开仓库 Actions 页面，确认并启用此工作流；若发布失败，检查 Actions 的 `GITHUB_TOKEN` 仓库 `contents: write` 权限及工作流日志。构建流程在测试通过后才更新 `release` 分支。
+
+## Clash Mi/Mihomo 使用
+
+首次 Actions 构建**成功发布后**，可获取实际生成的 [规则集配置片段](https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/clash-snippet.yaml)。它只包括 rule-providers 和个人规则，不能当作完整订阅覆盖节点、DNS 与 proxy-groups。私人 direct 规则应在私人 proxy 和通用分流规则之前；现有策略组名称为 `节点选择`。
+
+典型 Loyalsoldier 文件（仅当 release 分支完成发布才有效）：
 
 ```yaml
 rule-providers:
-  private:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/private.mrs"
-    path: ./ruleset/private.mrs
-    interval: 86400
-
-  lancidr:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/lancidr.mrs"
-    path: ./ruleset/lancidr.mrs
-    interval: 86400
-
   direct:
     type: http
     behavior: domain
     format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/direct.mrs"
-    path: ./ruleset/direct.mrs
-    interval: 86400
-
-  cncidr:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/cncidr.mrs"
-    path: ./ruleset/cncidr.mrs
-    interval: 86400
-
-rules:
-  - RULE-SET,private,DIRECT
-  - RULE-SET,lancidr,DIRECT,no-resolve
-  - RULE-SET,direct,DIRECT
-  - RULE-SET,cncidr,DIRECT
-  - GEOIP,CN,DIRECT
-  - MATCH,PROXY
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/direct.mrs
+    path: ./ruleset/forlooong/loyalsoldier/direct.mrs
+    interval: 43200
+    proxy: 节点选择
 ```
 
----
+`interval: 43200` 控制客户端每 12 小时检查规则更新，与 GitHub Actions 的每日构建以及完整 Clash 订阅刷新相互独立。MRS 通常降低规则解析开销，但不能保证彻底消除 iOS VPN 断开。GitHub Raw 与第三方 CDN 可能有不同缓存和网络可达性。
 
-## 规则集列表 (Loyalsoldier 源)
+## 开发测试
 
-| 规则名称 | 规则类型 | 格式 | 订阅路径 | 说明 |
-| :--- | :--- | :--- | :--- | :--- |
-| `direct` | `domain` | `mrs` | `loyalsoldier/direct.mrs` | 常用直连域名 |
-| `cncidr` | `ipcidr` | `mrs` | `loyalsoldier/cncidr.mrs` | 中国大陆 IPv4/IPv6 段 |
-| `private` | `domain` | `mrs` | `loyalsoldier/private.mrs` | 私有网络域名 |
-| `lancidr` | `ipcidr` | `mrs` | `loyalsoldier/lancidr.mrs` | 局域网 IP 段 |
-| `gfw` | `domain` | `mrs` | `loyalsoldier/gfw.mrs` | GFW 域名列表 |
-| `proxy` | `domain` | `mrs` | `loyalsoldier/proxy.mrs` | 常用代理域名 |
-| `reject` | `domain` | `mrs` | `loyalsoldier/reject.mrs` | 广告及隐私追踪域名 |
-| `apple` | `domain` | `mrs` | `loyalsoldier/apple.mrs` | 苹果常用服务域名 |
-| `google` | `domain` | `mrs` | `loyalsoldier/google.mrs` | 谷歌服务域名 |
-| `icloud` | `domain` | `mrs` | `loyalsoldier/icloud.mrs` | 苹果 iCloud 域名 |
-| `tld-not-cn` | `domain` | `mrs` | `loyalsoldier/tld-not-cn.mrs` | 非 .cn 顶级域名 |
-| `telegramcidr` | `ipcidr` | `mrs` | `loyalsoldier/telegramcidr.mrs` | Telegram IP 段 |
-| `greatfire` | `domain` | `mrs` | `loyalsoldier/greatfire.mrs` | GreatFire 域名列表 |
+使用 Python 3.12、PyYAML 6.0.2，以及 Mihomo v1.19.32。执行 `python3 -m unittest discover -s tests -v`，再执行 `bash scripts/build.sh` 构建；CI 还以 `mihomo -t` 校验生成的本地 file rule-providers。
 
----
-
-## 全量 `rule-providers` 订阅模版（按需选用）
-
-```yaml
-rule-providers:
-  reject:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/reject.mrs"
-    path: ./ruleset/reject.mrs
-    interval: 86400
-
-  icloud:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/icloud.mrs"
-    path: ./ruleset/icloud.mrs
-    interval: 86400
-
-  apple:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/apple.mrs"
-    path: ./ruleset/apple.mrs
-    interval: 86400
-
-  google:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/google.mrs"
-    path: ./ruleset/google.mrs
-    interval: 86400
-
-  proxy:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/proxy.mrs"
-    path: ./ruleset/proxy.mrs
-    interval: 86400
-
-  direct:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/direct.mrs"
-    path: ./ruleset/direct.mrs
-    interval: 86400
-
-  private:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/private.mrs"
-    path: ./ruleset/private.mrs
-    interval: 86400
-
-  gfw:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/gfw.mrs"
-    path: ./ruleset/gfw.mrs
-    interval: 86400
-
-  greatfire:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/greatfire.mrs"
-    path: ./ruleset/greatfire.mrs
-    interval: 86400
-
-  tld-not-cn:
-    type: http
-    behavior: domain
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/tld-not-cn.mrs"
-    path: ./ruleset/tld-not-cn.mrs
-    interval: 86400
-
-  telegramcidr:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/telegramcidr.mrs"
-    path: ./ruleset/telegramcidr.mrs
-    interval: 86400
-
-  cncidr:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/cncidr.mrs"
-    path: ./ruleset/cncidr.mrs
-    interval: 86400
-
-  lancidr:
-    type: http
-    behavior: ipcidr
-    format: mrs
-    url: "https://cdn.jsdelivr.net/gh/CRThu/clash-rules-mrs@release/loyalsoldier/lancidr.mrs"
-    path: ./ruleset/lancidr.mrs
-    interval: 86400
-```
+如果合并上游 Fork 更新，需检查上游是否改动 `.github/workflows/sync.yml` 和 `scripts/build.sh`，不要覆盖私人转换功能。原项目与规则贡献者版权归各自作者。
