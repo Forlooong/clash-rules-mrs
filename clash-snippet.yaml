@@ -1,0 +1,124 @@
+# Merge into the existing YAML; insert personal rules before other rules, keep original MATCH.
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/reject.mrs
+    path: ./ruleset/forlooong/loyalsoldier/reject.mrs
+    interval: 43200
+    proxy: 节点选择
+  icloud:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/icloud.mrs
+    path: ./ruleset/forlooong/loyalsoldier/icloud.mrs
+    interval: 43200
+    proxy: 节点选择
+  apple:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/apple.mrs
+    path: ./ruleset/forlooong/loyalsoldier/apple.mrs
+    interval: 43200
+    proxy: 节点选择
+  google:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/google.mrs
+    path: ./ruleset/forlooong/loyalsoldier/google.mrs
+    interval: 43200
+    proxy: 节点选择
+  proxy:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/proxy.mrs
+    path: ./ruleset/forlooong/loyalsoldier/proxy.mrs
+    interval: 43200
+    proxy: 节点选择
+  direct:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/direct.mrs
+    path: ./ruleset/forlooong/loyalsoldier/direct.mrs
+    interval: 43200
+    proxy: 节点选择
+  private:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/private.mrs
+    path: ./ruleset/forlooong/loyalsoldier/private.mrs
+    interval: 43200
+    proxy: 节点选择
+  gfw:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/gfw.mrs
+    path: ./ruleset/forlooong/loyalsoldier/gfw.mrs
+    interval: 43200
+    proxy: 节点选择
+  greatfire:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/greatfire.mrs
+    path: ./ruleset/forlooong/loyalsoldier/greatfire.mrs
+    interval: 43200
+    proxy: 节点选择
+  tld-not-cn:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/tld-not-cn.mrs
+    path: ./ruleset/forlooong/loyalsoldier/tld-not-cn.mrs
+    interval: 43200
+    proxy: 节点选择
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/telegramcidr.mrs
+    path: ./ruleset/forlooong/loyalsoldier/telegramcidr.mrs
+    interval: 43200
+    proxy: 节点选择
+  cncidr:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/cncidr.mrs
+    path: ./ruleset/forlooong/loyalsoldier/cncidr.mrs
+    interval: 43200
+    proxy: 节点选择
+  lancidr:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/lancidr.mrs
+    path: ./ruleset/forlooong/loyalsoldier/lancidr.mrs
+    interval: 43200
+    proxy: 节点选择
+  applications:
+    type: http
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/applications.yaml
+    path: ./ruleset/forlooong/loyalsoldier/applications.yaml
+    interval: 43200
+    proxy: 节点选择
+  personal-direct-domain:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/personal/personal-direct-domain.mrs
+    path: ./ruleset/forlooong/personal/personal-direct-domain.mrs
+    interval: 43200
+    proxy: 节点选择
+rules:
+- RULE-SET,personal-direct-domain,DIRECT

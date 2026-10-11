@@ -1,0 +1,17 @@
+{
+  "reject": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/reject.mrs",
+  "icloud": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/icloud.mrs",
+  "apple": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/apple.mrs",
+  "google": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/google.mrs",
+  "proxy": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/proxy.mrs",
+  "direct": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/direct.mrs",
+  "private": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/private.mrs",
+  "gfw": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/gfw.mrs",
+  "greatfire": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/greatfire.mrs",
+  "tld-not-cn": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/tld-not-cn.mrs",
+  "telegramcidr": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/telegramcidr.mrs",
+  "cncidr": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/cncidr.mrs",
+  "lancidr": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/lancidr.mrs",
+  "applications": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/loyalsoldier/applications.yaml",
+  "personal-direct-domain": "https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/release/personal/personal-direct-domain.mrs"
+}

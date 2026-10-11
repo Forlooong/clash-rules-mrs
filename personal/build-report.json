@@ -1,0 +1,12 @@
+{
+  "direct": {
+    "domain": 2,
+    "ipcidr": 0,
+    "classical": 0
+  },
+  "proxy": {
+    "domain": 0,
+    "ipcidr": 0,
+    "classical": 0
+  }
+}
