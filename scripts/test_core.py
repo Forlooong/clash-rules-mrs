@@ -61,6 +61,9 @@ def exercise(mihomo, config, cases):
                    "find-process-mode": "off",
                    "secret": "", "allow-lan": False, "bind-address": "127.0.0.1", "log-level": "info"})
     config["rules"] = [trace(r) for r in config["rules"]]
+    # A non-LAN address avoids resolving synthetic regex fixtures on public DNS.
+    # HTTP outbounds still terminate at the loopback mock, never at this address.
+    config["hosts"] = {host: "8.8.4.4" for host, _, _ in cases}
     with tempfile.TemporaryDirectory(dir=ROOT / "raw") as directory:
         path = Path(directory)
         cfg = path / "config.yaml"
@@ -89,6 +92,15 @@ def exercise(mihomo, config, cases):
                 time.sleep(.05)
             else:
                 raise AssertionError("Rule providers did not finish initialization")
+            # Even a configuration without file providers initializes group adapters
+            # asynchronously. Wait for the real loopback outbounds before traffic.
+            for _ in range(100):
+                proxies = json.load(opener.open(api.replace("/connections", "/proxies"), timeout=1))["proxies"]
+                if all(name in proxies for name in ("TRACE_DIRECT", "TRACE_REJECT", "TRACE_PROXY")):
+                    break
+                time.sleep(.05)
+            else:
+                raise AssertionError("Mock outbounds did not initialize")
             for host, chain, payload in cases:
                 with socket.create_connection(("127.0.0.1", proxy_port), timeout=3) as conn:
                     conn.sendall(("GET http://" + host + "/ HTTP/1.1\r\nHost: " + host +
