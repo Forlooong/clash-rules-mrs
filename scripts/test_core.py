@@ -58,6 +58,7 @@ def trace(rule):
 def exercise(mihomo, config, cases):
     proxy_port, api_port = port(), port()
     config.update({"mixed-port": proxy_port, "external-controller": "127.0.0.1:" + str(api_port),
+                   "find-process-mode": "off",
                    "secret": "", "allow-lan": False, "bind-address": "127.0.0.1", "log-level": "info"})
     config["rules"] = [trace(r) for r in config["rules"]]
     with tempfile.TemporaryDirectory(dir=ROOT / "raw") as directory:
@@ -79,12 +80,21 @@ def exercise(mihomo, config, cases):
                     break
                 except OSError: time.sleep(.1)
             else: raise AssertionError("Core did not start")
+            # File providers initialize asynchronously after the controller opens.
+            names = set(config.get("rule-providers", {}))
+            for _ in range(200):
+                loaded = json.load(opener.open(api.replace("/connections", "/providers/rules"), timeout=1))["providers"]
+                if all(loaded.get(n, {}).get("ruleCount", 0) > 0 for n in names):
+                    break
+                time.sleep(.05)
+            else:
+                raise AssertionError("Rule providers did not finish initialization")
             for host, chain, payload in cases:
                 with socket.create_connection(("127.0.0.1", proxy_port), timeout=3) as conn:
                     conn.sendall(("GET http://" + host + "/ HTTP/1.1\r\nHost: " + host +
                                   "\r\nConnection: close\r\n\r\n").encode())
                     match = None
-                    for _ in range(60):
+                    for _ in range(500):
                         current = json.load(opener.open(api, timeout=1))["connections"] or []
                         match = next((c for c in current if c["metadata"].get("host") == host), None)
                         if match: break
