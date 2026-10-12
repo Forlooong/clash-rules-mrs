@@ -1,13 +1,20 @@
-name: Sync and Build MRS Rulesets
+name: Sync and Build Four-Source MRS
 on:
   schedule:
     - cron: '0 23 * * *'
   push:
+    branches: [main, codex/four-source-mrs]
+    paths: ['personal/**', 'scripts/**', 'runtime/**', 'tests/**', 'NOTICE.md', '.github/workflows/sync.yml']
+  pull_request:
     branches: [main]
-    paths: ['personal/**', 'scripts/**', 'tests/**', '.github/workflows/sync.yml']
   workflow_dispatch:
+    inputs:
+      allow_count_change:
+        description: 'Permit reviewed >20% count changes for this run only'
+        type: boolean
+        default: false
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: publish-mrs
   cancel-in-progress: false
@@ -15,55 +22,71 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Dependencies
-        run: python3 -m pip install 'PyYAML==6.0.2'
-      - name: Unit tests
-        run: python3 -m unittest discover -s tests -v
-      - name: Install Mihomo
+      - name: Dependencies and unit tests
+        run: |
+          python3 -m pip install 'PyYAML==6.0.2'
+          python3 -m unittest discover -s tests -v
+      - name: Install pinned Mihomo
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MIHOMO_TAG: v1.19.32
         run: |
           set -euo pipefail
-          json="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/MetaCubeX/mihomo/releases/tags/$MIHOMO_TAG")"
-          url="$(jq -r '[.assets[].browser_download_url | select(test("linux-amd64-compatible.*\\.gz$"))][0] // empty' <<<"$json")"
-          if [ -z "$url" ]; then
-            url="$(jq -r '[.assets[].browser_download_url | select(test("linux-amd64.*\\.gz$"))][0] // empty' <<<"$json")"
-          fi
-          test -n "$url"
-          curl -fsSL --retry 3 -o mihomo.gz "$url"
+          gh release download v1.19.32 --repo MetaCubeX/mihomo --pattern 'mihomo-linux-amd64-compatible-v1.19.32.gz' --output mihomo.gz
           gzip -t mihomo.gz
           gzip -dc mihomo.gz > mihomo
           sudo install -m 0755 mihomo /usr/local/bin/mihomo
           mihomo -v
-      - name: Build and smoke test
+      - name: Build pinned four-source snapshot and legacy compatibility output
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_ID: rules-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -euo pipefail
-          bash scripts/build.sh
+          python3 scripts/four_sources.py
+          loyal_sha="$(python3 -c 'import json; print(json.load(open("out/build-manifest.json"))["sources"]["loyal"]["commit"])')"
+          mv out snapshot-out
+          BASE_URL="https://raw.githubusercontent.com/Loyalsoldier/clash-rules/$loyal_sha" bash scripts/build.sh
           test "$(find out/loyalsoldier -maxdepth 1 -name '*.mrs' | wc -l)" -eq 13
           mihomo -t -d "$PWD" -f out/smoke.yaml
-          cat out/personal/build-report.json
-      - name: Publish release branch
+          mv out compat-out
+          mv snapshot-out out
+          python3 scripts/test_core.py
+      - name: Upload candidate build for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-snapshot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            out
+            compat-out
+          retention-days: 30
+      - name: Publish immutable tag, verified Release and candidate pointer
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_COUNT_CHANGE: ${{ inputs.allow_count_change }}
+        run: python3 scripts/publish_snapshot.py
+      - name: Publish preview candidate index
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: candidates
+          publish_dir: ./candidate-out
+          keep_files: false
+          force_orphan: true
+      - name: Publish unchanged-format legacy branch and candidate pointer
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: release
-          publish_dir: ./out
+          publish_dir: ./compat-out
           keep_files: false
           force_orphan: true
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: MRS build ${{ github.run_id }}
-          tag_name: build-${{ github.run_id }}-${{ github.run_attempt }}
-          files: |
-            out/loyalsoldier/*.mrs
-            out/personal/*.mrs
-            out/personal/*.yaml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

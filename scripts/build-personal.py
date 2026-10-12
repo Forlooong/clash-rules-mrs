@@ -34,7 +34,7 @@ def split(items):
         if kind in ("DOMAIN", "DOMAIN-SUFFIX") and len(fields) == 2:
             if not DOMAIN.fullmatch(value):
                 raise ValueError(f"Invalid domain: {rule!r}")
-            groups["domain"].append(("full:" if kind == "DOMAIN" else "+.") + value.lower())
+            groups["domain"].append(("" if kind == "DOMAIN" else "+.") + value.lower())
         elif kind in ("IP-CIDR", "IP-CIDR6") and len(fields) == 2:
             try:
                 net = ipaddress.ip_network(value, strict=False)

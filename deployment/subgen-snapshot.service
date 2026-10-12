@@ -1,0 +1,13 @@
+[Unit]
+Description=Verify and stage the complete public rule snapshot
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/proxy-stack/subgen/snapshot.py refresh --state /opt/proxy-stack/subgen/snapshot-state
+TimeoutStartSec=150
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/proxy-stack/subgen/snapshot-state
