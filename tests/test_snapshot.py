@@ -28,10 +28,12 @@ class SnapshotTests(unittest.TestCase):
         rule = r"DOMAIN-REGEX,^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$"
         self.assertEqual(b.parse_rule(rule), ("inline", rule))
         m, inline, _ = fixture()
-        inline["sections"]["private"] = [rule]
+        literal_suffix = r"DOMAIN-REGEX,^literal,no-resolve"
+        inline["sections"]["private"] = [rule, literal_suffix]
         inline["sections"]["personal_proxy"] = ["IP-CIDR,192.0.2.0/24,no-resolve"]
         doc = s.assemble({}, m, inline)
         self.assertIn(rule + ",DIRECT", doc["rules"])
+        self.assertIn(literal_suffix + ",DIRECT", doc["rules"])
         self.assertIn("IP-CIDR,192.0.2.0/24,节点选择,no-resolve", doc["rules"])
         self.assertLess(doc["rules"].index("RULE-SET,acl-unban-domain,DIRECT"),
                         doc["rules"].index("RULE-SET,reject,REJECT"))

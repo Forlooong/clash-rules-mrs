@@ -130,7 +130,7 @@ def assemble(doc, m, inline, local_dir=None):
             rules.append("RULE-SET," + name + "," + action + suffix)
     def section(name, action):
         for rule in inline["sections"][name]:
-            if rule.endswith(",no-resolve"):
+            if rule.partition(",")[0] in ("IP-CIDR", "IP-CIDR6") and rule.endswith(",no-resolve"):
                 rules.append(rule[:-11] + "," + action + ",no-resolve")
             else:
                 rules.append(rule + "," + action)

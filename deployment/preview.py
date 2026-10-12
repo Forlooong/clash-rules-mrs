@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import yaml
 from snapshot import read_json, validate_manifest, validate_inline
@@ -40,7 +41,8 @@ class Handler(BaseHTTPRequestHandler):
             m = validate_manifest(read_json(STATE / tag / "build-manifest.json"))
             inline = validate_inline(m, read_json(STATE / tag / "inline-rules.json"))
             cfg = read_json(BASE / "config.json")
-            doc = generator.make_config(cfg, generator.node_states(cfg), snapshot_override=(m, inline))
+            states = generator.node_states(cfg, time.time())
+            doc = generator.make_config(cfg, states, snapshot_override=(m, inline))
             data = yaml.safe_dump(doc, allow_unicode=True, sort_keys=False).encode()
         except Exception:
             self.send_error(503, "Preview unavailable")
@@ -49,6 +51,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/yaml; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Rule-Build", tag)
+        if all(state is not None for state in states):
+            used = sum(state["used_bytes"] for state in states)
+            total = sum(state["quota_bytes"] for state in states)
+            self.send_header("Subscription-Userinfo", f"upload=0; download={used}; total={total}; expire=0")
         self.send_header("Profile-Update-Interval", "24")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
