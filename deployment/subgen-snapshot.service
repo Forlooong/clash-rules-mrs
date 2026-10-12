@@ -4,6 +4,8 @@ After=network-online.target
 
 [Service]
 Type=oneshot
+User=proxy-sub
+Group=proxy-sub
 ExecStart=/usr/bin/python3 /opt/proxy-stack/subgen/snapshot.py refresh --state /opt/proxy-stack/subgen/snapshot-state
 TimeoutStartSec=150
 UMask=0077
