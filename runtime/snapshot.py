@@ -25,7 +25,8 @@ for direction in ("direct", "proxy"):
         PROVIDERS[n] = ("personal/" + n + ".mrs", behavior)
 META_FILES = {"inline-rules.json", "build-report.json", "cidr-report.json",
               "conflict-report.json", "sources.json", "licenses/NOTICE.md", "licenses/acl-LICENSE",
-              "licenses/acl-README.md", "licenses/loyal-README.md", "licenses/meta-README.md"}
+              "licenses/acl-README.md", "licenses/loyal-README.md", "licenses/meta-README.md",
+              "licenses/loyal-LICENSE", "licenses/meta-LICENSE", "source-archive.tar.gz"}
 TAG = re.compile(r"rules-[A-Za-z0-9][A-Za-z0-9._-]{0,80}$")
 ALLOWED = {"DOMAIN-KEYWORD", "DOMAIN-REGEX", "PROCESS-NAME", "PROCESS-PATH",
            "PROCESS-NAME-REGEX", "PROCESS-PATH-REGEX", "DST-PORT", "SRC-PORT",

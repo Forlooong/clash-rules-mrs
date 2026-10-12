@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import time
 import urllib.request
 import yaml
@@ -281,11 +282,24 @@ class Builder:
                 sha = json.loads(get(f"https://api.github.com/repos/{repo}/commits/master", True))["sha"]
                 self.sources[source]["notice_commit"] = sha
                 text = get(f"https://raw.githubusercontent.com/{repo}/{sha}/README.md").decode("utf-8")
+                (license_dir / (source + "-LICENSE")).write_bytes(get(f"https://raw.githubusercontent.com/{repo}/{sha}/LICENSE"))
             else:
                 text = self.fetch(source, "README.md")
             (license_dir / (source + "-README.md")).write_text(text, encoding="utf-8")
         (license_dir / "acl-LICENSE").write_bytes(get("https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt"))
         write_json(self.out / "sources.json", self.sources)
+        # Retain source even when upstream rewrites its release branch.
+        with tarfile.open(self.out / "source-archive.tar.gz", "w:gz") as archive:
+            for source, info in self.sources.items():
+                for rel in info["files"]:
+                    path = ROOT / rel if source == "personal" else self.raw / source / rel
+                    arc = "builder/" + rel if source == "personal" else "builder/raw/" + source + "/" + rel
+                    archive.add(path, arcname=arc)
+            for rel in ("scripts/four_sources.py", "runtime/snapshot.py", "runtime/__init__.py",
+                        "README.md", "NOTICE.md", "LICENSE"):
+                archive.add(ROOT / rel, arcname="builder/" + rel)
+            archive.add(self.out / "sources.json", arcname="builder/out/sources.json")
+            archive.add(license_dir, arcname="licenses")
         version = subprocess.check_output([self.mihomo, "-v"], text=True).strip()
         for p in self.out.rglob("*"):
             if p.is_file() and p.name != "build-manifest.json":
@@ -297,6 +311,7 @@ class Builder:
                     "providers": providers, "files": files,
                     "counts": {source: counts["input"] for source, counts in self.stats.items()},
                     "provider_counts": {n: c["output"] for n, c in coverage.items()}}
+        manifest["distribution_license"] = "GPL-3.0; ACL-only collections retain CC-BY-SA-4.0"
         validate_manifest(manifest)
         write_json(self.out / "build-manifest.json", manifest)
         config = {"mixed-port": 0, "mode": "rule", "proxies": [],

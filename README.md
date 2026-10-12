@@ -21,6 +21,7 @@ MetaCubeX 从 classical 文本读取，保留 domain-only 导出无法承载的�
 - inline-rules.json：个人直连/代理、本地、广告、applications、服务代理、通用代理、直连八个固定区段。
 - sources.json、build-report.json、conflict-report.json、cidr-report.json：来源、重复覆盖、冲突与规范化。
 - licenses：原始来源说明、CC BY-SA 4.0 文本及修改声明；见 [NOTICE](NOTICE.md)。
+- 融合产物采用 GPLv3，并保留 ACL 原始授权；source-archive.tar.gz 保留可重编的原文、转换源码及全部许可。解压后在 builder 目录安装依赖及指定版本 Mihomo，使用 --offline 重编。
 - GitHub Release：完整快照附件，远程文件与附件全部校验后才发布候选索引。
 
 测试分支只更新 **candidates/candidate.json**；主分支验收后更新 **release/candidate.json**。旧 release/loyalsoldier/*.mrs、applications.yaml、个人 YAML、manifest.json、clash-snippet.yaml 保留基础语义和原格式，不混入新融合结果。

@@ -15,8 +15,11 @@ def adapt(source):
     body = "".join(lines[function.lineno - 1:function.end_lineno])
     if body.count("snippet = load_rules()") != 1 or body.count("return {") != 1:
         raise ValueError("Production generator changed; manual review required")
+    if [a.arg for a in function.args.args] != ["config", "states"]:
+        raise ValueError("Production make_config signature changed")
+    body = body.replace("def make_config(config, states):", "def make_config(config, states, snapshot_override=None):")
     body = body.replace("    snippet = load_rules()", """    state_dir = BASE / 'snapshot-state'
-    active = load_active(state_dir) if (state_dir / 'active.json').exists() else None
+    active = snapshot_override or (load_active(state_dir) if (state_dir / 'active.json').exists() else None)
     snippet = load_rules() if active is None else {'rule-providers': {}, 'rules': []}""")
     body = body.replace("    return {", "    doc = {")
     body += "\n    return assemble(doc, *active) if active else doc\n"

@@ -1,20 +1,26 @@
-# Rule source attribution and modifications
+# Source attribution, licenses and modifications
 
-Public rule data is derived from:
+Public rule inputs:
 
-- Loyalsoldier/clash-rules (release branch), including its upstream attribution.
-- ACL4SSR/ACL4SSR (master branch), CC BY-SA 4.0.
-- MetaCubeX/meta-rules-dat (meta branch), with source attribution in master README.
+- Loyalsoldier/clash-rules, release branch; GPLv3 repository.
+- ACL4SSR/ACL4SSR, master branch; CC BY-SA 4.0.
+- MetaCubeX/meta-rules-dat, meta branch; GPLv3 repository.
 - Forlooong/clash-rules-mrs personal/direct.yaml and personal/proxy.yaml.
 
-ACL4SSR-derived rule data, including the merged domain/IP collections, is
-distributed under CC BY-SA 4.0 with attribution and modification notices.
-This does not relicense unrelated upstream materials or the entire repository.
-Upstream READMEs and the CC BY-SA legal text accompany every snapshot.
-MetaCubeX aggregates other sources; their attribution and applicable terms
-remain in its README. Build manifests record immutable source commits.
+Combined adapted collections and the new build/runtime code are distributed
+under GPLv3. ACL-only collections (unban-domain and direct-ipcidr) retain
+CC BY-SA 4.0. Original ACL material retains attribution, CC terms and
+modification notices. CC BY-SA 4.0 permits one-way compatibility with GPLv3
+for adaptations: https://creativecommons.org/compatible-licenses/
+GPL material is not relabeled as CC BY-SA.
 
-Changes: parsing, normalization, equivalent same-policy deduplication,
-Fake-IP range subtraction, selected-source merging, MRS recompilation,
-classical predicate extraction into inline-rules.json. ProxyGFWlist IP
-rules are intentionally excluded. Credentials are never part of rule data.
+Snapshots retain both GPL license texts, original READMEs and the CC legal
+text. MetaCubeX's dependency attributions remain in its README. Source and
+notice commits are recorded independently. source-archive.tar.gz preserves
+corresponding text inputs, builder/runtime source and notices even if an
+upstream release branch is rewritten.
+
+Changes: normalization, equivalent same-policy deduplication, Fake-IP
+subtraction, selected-source merging, MRS recompilation and classical
+predicate extraction into inline-rules.json. ProxyGFWlist IPs are excluded.
+Credentials and private subscriptions are never part of published source.
