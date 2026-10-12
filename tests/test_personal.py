@@ -20,7 +20,7 @@ class Personal(unittest.TestCase):
         result = mod.split(["DOMAIN,Example.com", "DOMAIN-SUFFIX,example.net",
                             "IP-CIDR,192.0.2.1/24", "IP-CIDR6,2001:db8::/32",
                             "IP-CIDR,192.0.2.0/24,no-resolve", "DOMAIN-KEYWORD,abc"])
-        self.assertEqual(result["domain"], ["full:example.com", "+.example.net"])
+        self.assertEqual(result["domain"], ["example.com", "+.example.net"])
         self.assertEqual(result["ipcidr"], ["192.0.2.0/24", "2001:db8::/32"])
         self.assertEqual(result["classical"], ["IP-CIDR,192.0.2.0/24,no-resolve", "DOMAIN-KEYWORD,abc"])
 
