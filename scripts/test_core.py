@@ -17,6 +17,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from runtime.snapshot import assemble, read_json
+from runtime.dns import assemble_dns
 
 class Mock(BaseHTTPRequestHandler):
     def log_message(self, *args): pass
@@ -55,7 +56,7 @@ def trace(rule):
     prefix, action = rule.rsplit(",", 1)
     return prefix + "," + {"DIRECT": "TRACE_DIRECT", "REJECT": "TRACE_REJECT"}.get(action, action)
 
-def exercise(mihomo, config, cases):
+def exercise(mihomo, config, cases, hosts=None):
     proxy_port, api_port = port(), port()
     config.update({"mixed-port": proxy_port, "external-controller": "127.0.0.1:" + str(api_port),
                    "find-process-mode": "off",
@@ -64,6 +65,7 @@ def exercise(mihomo, config, cases):
     # A non-LAN address avoids resolving synthetic regex fixtures on public DNS.
     # HTTP outbounds still terminate at the loopback mock, never at this address.
     config["hosts"] = {host: "8.8.4.4" for host, _, _ in cases}
+    config["hosts"].update(hosts or {})
     with tempfile.TemporaryDirectory(dir=ROOT / "raw") as directory:
         path = Path(directory)
         cfg = path / "config.yaml"
@@ -130,6 +132,7 @@ def exercise(mihomo, config, cases):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--mihomo", default="mihomo")
+    p.add_argument("--snapshot-dir", default=str(ROOT / "out"))
     args = p.parse_args()
     mock = ThreadingHTTPServer(("127.0.0.1", 0), Mock)
     threading.Thread(target=mock.serve_forever, daemon=True).start()
@@ -139,9 +142,10 @@ def main():
             for name in ("TRACE_DIRECT", "TRACE_REJECT", "TRACE_PROXY")],
             "proxy-groups": [{"name": "节点选择", "type": "select", "proxies": ["TRACE_PROXY"]}]}
     try:
-        m, inline = read_json(ROOT / "out/build-manifest.json"), read_json(ROOT / "out/inline-rules.json")
-        full = assemble(config(), m, inline, local_dir=ROOT / "out")
-        exercise(args.mihomo, full, [
+        directory = Path(args.snapshot_dir).resolve()
+        m, inline = read_json(directory / "build-manifest.json"), read_json(directory / "inline-rules.json")
+        full = assemble_dns(assemble(config(), m, inline, local_dir=directory), m, inline)
+        legacy_cases = [
             ("binance.com", "TRACE_DIRECT", "personal-direct-domain"),
             ("api.bybit-global.com", "TRACE_DIRECT", "personal-direct-domain"),
             ("dl.google.com", "TRACE_DIRECT", "acl-unban-domain"),
@@ -152,7 +156,42 @@ def main():
             ("youtube.com", "TRACE_PROXY", None),
             ("doubleclick.net", "TRACE_REJECT", "reject"),
             ("miwifi.com", "TRACE_DIRECT", "private"),
-        ])
+        ]
+        balanced_cases = [
+            ("binance.com", "TRACE_DIRECT", "personal-direct-domain"),
+            ("accounts.binance.com", "TRACE_DIRECT", "personal-direct-domain"),
+            ("api.bybit-global.com", "TRACE_DIRECT", "personal-direct-domain"),
+            ("www.bybit.com", "TRACE_DIRECT", "personal-direct-domain"),
+            ("dl.google.com", "TRACE_PROXY", "services-proxy"),
+            ("accounts.google.com", "TRACE_PROXY", "services-proxy"),
+            ("netflix.com", "TRACE_PROXY", "services-proxy"),
+            ("github.com", "TRACE_PROXY", "services-proxy"),
+            ("objects.githubusercontent.com", "TRACE_PROXY", "services-proxy"),
+            ("chatgpt.com", "TRACE_PROXY", "services-proxy"),
+            ("youtube.com", "TRACE_PROXY", "services-proxy"),
+            ("doubleclick.net", "TRACE_PROXY", None),
+            ("hcaptcha.com", "TRACE_PROXY", None),
+            ("geetest.datasink.sensorsdata.cn", "TRACE_DIRECT", "cn-domain"),
+            ("miwifi.com", "TRACE_DIRECT", "private-domain"),
+            ("baidu.com", "TRACE_DIRECT", "cn-domain"),
+            # geolocation-cn is deliberately narrower than the full cn/company
+            # union. qq.com uses the actively resolved domestic-IP fallback.
+            ("qq.com", "TRACE_DIRECT", "cn-ipcidr"),
+            ("ordinary.amazonaws.com", "TRACE_PROXY", ""),
+            ("ordinary.webpubsub.azure.com", "TRACE_PROXY", ""),
+            ("ordinary.cloudflare.com", "TRACE_PROXY", ""),
+            ("tenant.amazonaws.cn", "TRACE_PROXY", ""),
+            ("tenant.cloudfront.cn", "TRACE_PROXY", ""),
+            ("tenant.qiniucdn.com", "TRACE_PROXY", ""),
+            # .example is correctly covered by private-domain in the real
+            # dataset; use hosts-only synthetic .com names for unknown routes.
+            ("uncategorized-cn-ip.mrs-regression-probe.com", "TRACE_DIRECT", "cn-ipcidr"),
+            ("uncategorized-overseas.mrs-regression-probe.com", "TRACE_PROXY", ""),
+        ]
+        selected_cases = balanced_cases if m["schema_version"] == 2 else legacy_cases
+        exercise(args.mihomo, full, selected_cases,
+                 {"uncategorized-cn-ip.mrs-regression-probe.com": "223.5.5.5", "qq.com": "223.5.5.5"}
+                 if m["schema_version"] == 2 else None)
         # Isolate regexes otherwise shadowed by equivalent domain suffixes.
         regex = config()
         regex["rules"] = [r + ",节点选择" for r in inline["sections"]["services"] if r.startswith("DOMAIN-REGEX,")]
@@ -179,7 +218,7 @@ def main():
             ("suffix-example.com", "TRACE_PROXY", "exact"), ("sub.suffix-example.com", "TRACE_PROXY", "exact"),
             ("similar-example.com", "TRACE_DIRECT", ""),
         ])
-        print("PASS: 22 actual-core routing checks (traced to loopback; no public traffic)")
+        print(f"PASS: {len(selected_cases) + 12} actual-core routing checks (traced to loopback; no public traffic)")
     finally:
         mock.shutdown()
         mock.server_close()

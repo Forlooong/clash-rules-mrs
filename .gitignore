@@ -4,6 +4,10 @@ raw/
 out/
 compat-out/
 candidate-out/
+balanced-out/
+audit/
+.cache/
+audit-rules-*.tar.gz
 snapshot-out/
 __pycache__/
 *.pyc

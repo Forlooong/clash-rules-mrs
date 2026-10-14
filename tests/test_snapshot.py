@@ -71,7 +71,7 @@ class SnapshotTests(unittest.TestCase):
     def test_hash_failure_does_not_replace_active_snapshot(self):
         m, inline, raw = fixture()
         manifest = json.dumps(m).encode()
-        candidate = json.dumps({"build_id": m["build_id"], "manifest_sha256": hashlib.sha256(manifest).hexdigest()}).encode()
+        candidate = json.dumps({"schema_version": 1, "build_id": m["build_id"], "manifest_sha256": hashlib.sha256(manifest).hexdigest()}).encode()
         def fake_download(url, maximum, deadline):
             if url.endswith("candidate.json"): return candidate
             if url.endswith("build-manifest.json"): return manifest
@@ -89,7 +89,7 @@ class SnapshotTests(unittest.TestCase):
     def test_success_only_stages_until_enabled(self):
         m, inline, raw = fixture()
         manifest = json.dumps(m).encode()
-        candidate = json.dumps({"build_id": m["build_id"], "manifest_sha256": hashlib.sha256(manifest).hexdigest()}).encode()
+        candidate = json.dumps({"schema_version": 1, "build_id": m["build_id"], "manifest_sha256": hashlib.sha256(manifest).hexdigest()}).encode()
         def fake_download(url, maximum, deadline):
             if url.endswith("candidate.json"): return candidate
             if url.endswith("build-manifest.json"): return manifest

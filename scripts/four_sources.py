@@ -366,8 +366,8 @@ def conflicts(records):
 def guard(manifest, previous):
     if not previous:
         return
-    if previous.get("schema_version") != 1:
-        raise ValueError("Unknown previous manifest schema")
+    if previous.get("schema_version") != manifest.get("schema_version"):
+        raise ValueError("Cannot compare counts across schema channels")
     for field in ("counts", "provider_counts"):
         for name, count in manifest[field].items():
             old = previous.get(field, {}).get(name)

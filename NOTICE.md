@@ -24,3 +24,13 @@ Changes: normalization, equivalent same-policy deduplication, Fake-IP
 subtraction, selected-source merging, MRS recompilation and classical
 predicate extraction into inline-rules.json. ProxyGFWlist IPs are excluded.
 Credentials and private subscriptions are never part of published source.
+
+Balanced v2 uses selected MetaCubeX categories and personal exceptions only.
+Loyalsoldier and ACL4SSR remain completely audited reference sources; excluded
+rules are not automatically added to routing. Known shared hosting/CDN root
+suffixes are omitted without removing narrower business domains. Domain/IP
+rules are recompiled to MRS; other supported predicates remain inline. V2
+corresponding source, complete upstream archives, license texts, attribution,
+projection reports and per-rule decisions are supplied separately in the
+audit-<build-id>.tar.gz Release asset. The runtime manifest binds the full
+audit manifest checksum; subscription consumers do not download that archive.

@@ -1,4 +1,4 @@
-name: Sync and Build Four-Source MRS
+name: Audit and Build Versioned MRS
 on:
   schedule:
     - cron: '0 23 * * *'
@@ -21,7 +21,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     permissions:
       contents: write
     steps:
@@ -31,7 +31,7 @@ jobs:
           python-version: '3.12'
       - name: Dependencies and unit tests
         run: |
-          python3 -m pip install 'PyYAML==6.0.2'
+          python3 -m pip install 'PyYAML==6.0.2' 'zstandard==0.24.0'
           python3 -m unittest discover -s tests -v
       - name: Install pinned Mihomo
         env:
@@ -58,20 +58,57 @@ jobs:
           mv out compat-out
           mv snapshot-out out
           python3 scripts/test_core.py
+      - name: Prepare v2 from the same fixed production commits
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/build_balanced.py --sources out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --prepare-only
+      - name: Cache immutable upstream archives
+        uses: actions/cache@v4
+        with:
+          path: .cache/audit
+          key: upstream-audit-${{ runner.os }}-${{ hashFiles('balanced-out/sources.json') }}
+          restore-keys: upstream-audit-${{ runner.os }}-
+      - name: Preserve complete original-source audit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          audit_exit=0
+          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit/original || audit_exit=$?
+          # A reported source defect proceeds only to deterministic repair.
+          # Tool failures or unreported/unknown errors cannot authorize a build.
+          test "$audit_exit" -le 1
+          test -f audit/original/manifest.json
+      - name: Rebuild defective MRS and audit every effective projection
+        run: |
+          python3 scripts/repair_sources.py --audit audit/original --sources balanced-out/sources.json --mihomo mihomo --output audit/repairs
+          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit --repairs audit/repairs
+      - name: Build v2 and exercise full rules and DNS in pinned core
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/build_balanced.py --sources balanced-out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --audit audit
+          python3 scripts/test_core.py --snapshot-dir balanced-out
+          python3 scripts/test_dns_core.py
       - name: Upload candidate build for inspection
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: verified-snapshot-${{ github.run_id }}-${{ github.run_attempt }}
+          name: audit-and-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             out
             compat-out
+            balanced-out
+            audit
           retention-days: 30
       - name: Publish immutable tag, verified Release and candidate pointer
         if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALLOW_COUNT_CHANGE: ${{ inputs.allow_count_change }}
-        run: python3 scripts/publish_snapshot.py
+        run: |
+          python3 scripts/publish_snapshot.py
+          python3 scripts/publish_snapshot.py --out balanced-out --audit audit
       - name: Publish preview candidate index
         if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4

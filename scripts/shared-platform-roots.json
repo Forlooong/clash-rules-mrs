@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "reason": "Shared hosting/CDN root: tenant location and business policy cannot be inferred from the platform suffix. Exact service domains and narrower tenant rules remain eligible; IP fallback still applies.",
+  "roots": [
+    "amazonaws.com", "amazonaws.cn", "amazonaws.com.cn", "cloudfront.net", "cloudfront.cn", "cloudfront-cn.net", "cloudfront-test.cn",
+    "azure.com", "azureedge.net", "azurewebsites.net", "windows.net", "cloudapp.net", "azurefd.net",
+    "cloudflare.com", "cloudflare.net", "cloudflareanycast.net", "cloudflareglobal.net", "cloudflareprod.com", "cloudflarestaging.com", "cloudflarestoragegw.com",
+    "workers.dev", "pages.dev", "r2.dev", "akamaized.net", "akamai.net", "akamaiedge.net", "akamaihd.net", "edgekey.net", "edgesuite.net", "fastly.net", "fastlylb.net",
+    "aliyuncs.com", "alicloudcs.com", "myqcloud.com", "qcloud.com", "tencentcloudapi.com", "qcloudcdn.com", "qcloudcos.com",
+    "clouddn.com", "qiniucdn.com", "qiniudn.com", "qbox.me", "qnssl.com", "upaiyun.com", "upyun.com", "upcdn.net", "aicdn.com",
+    "u-cdn.net", "ucloudoss.com", "ucloudstor.com", "ucloudufile.com", "ks-cdn.com", "ks-cdn1.com", "ksyuncdn.com", "ksyun.com", "ksyun.net",
+    "bcebos.com", "bce-cdn.cn", "bce-cdn.com", "bce-cdn.net", "baidubce.com", "baiduyuncdn.cn", "baiduyuncdn.com", "baiduyuncdn.net",
+    "wswebcdn.com", "wscdns.org", "wscdns.info", "wscdns.com", "qtlcdn.net", "qtlcdn.com", "qtlcdn.cn", "mwcloudcdn.com", "mwcdns.com", "cdnmg.com", "cdn30.org", "cdn20.com", "51cdn.com",
+    "tcdn.qq.com", "cdn.dnsv1.com", "cloudcache.cn", "cloudcache.com.cn", "chinacache.net", "ccgslb.com", "ccgslb.net", "ccgslb.com.cn"
+  ]
+}
