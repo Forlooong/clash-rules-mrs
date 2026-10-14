@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "build_id": "rules-38500106473-1",
+  "tag": "rules-38500106473-1",
+  "created_at": 1791944192,
+  "core_version": "Mihomo Meta v1.19.32 linux amd64 with go1.26.8 Wed Sep 30 16:55:19 UTC 2026\nUse tags: with_gvisor",
+  "fake_ip_pool": "198.18.0.0/16",
+  "sources": {
+    "loyal": {
+      "repository": "Loyalsoldier/clash-rules",
+      "ref": "release",
+      "commit": "650078a2e693f38a3e792b62e1e63d9aa632af2a",
+      "files": {
+        "reject.txt": {
+          "sha256": "98a5e65810360863694f641df19f135bec9162009efb786becc8a67d0a38bc99",
+          "size": 5576768
+        },
+        "icloud.txt": {
+          "sha256": "f1fb7e9d17400071bf77d853b2a3148ccb6a13d785cb97e73f1693142682b23f",
+          "size": 1141
+        },
+        "apple.txt": {
+          "sha256": "a47d516880dcf65f51d3b40e6a71c33253e0774bdc4a7ec0a0d0a09a4dd522a2",
+          "size": 5424
+        },
+        "google.txt": {
+          "sha256": "21a04f287800943b3fdfdef1f843173086171d9a0b5c9c33c3f73e1ec77d4c9e",
+          "size": 3368
+        },
+        "proxy.txt": {
+          "sha256": "52b3d688fee0baccf4e38513fc0e1fbf8fff26e01e4d728bf7d7614522795763",
+          "size": 620664
+        },
+        "direct.txt": {
+          "sha256": "8b5a1eb6595bd1c23e39f65df75e2129ca65c0b6273024dcf725ef4d999438fa",
+          "size": 2287419
+        },
+        "private.txt": {
+          "sha256": "3a04b128200ef8097d73b1496cbb23d24bc1e05d42fffb09f07c51699efb00b2",
+          "size": 3478
+        },
+        "gfw.txt": {
+          "sha256": "3a34f1f5d1283bf59281ece3410319142abed48386d42b9eb36cc183c7fe26c8",
+          "size": 94930
+        },
+        "greatfire.txt": {
+          "sha256": "8a12d20e2da723146e5d84756f09362848abd3ef596ba6a03eae6b188075a4b6",
+          "size": 283
+        },
+        "tld-not-cn.txt": {
+          "sha256": "67ada67716332c39e0afea361dd4b2ad66f55d0a92d3d1b90a7a1d4d47283f62",
+          "size": 11820
+        },
+        "telegramcidr.txt": {
+          "sha256": "328fca88c675763111c7f7585ec504e5c21ab9afb7a8ce6df33b7ac01b8a3ee0",
+          "size": 274
+        },
+        "cncidr.txt": {
+          "sha256": "0db34dd0446a376f5a8a2948b1878acd4a4b697025c7c02df3e56e4fd876c352",
+          "size": 210825
+        },
+        "lancidr.txt": {
+          "sha256": "82920b241dc328f1dc99849cf733ed8675a00a4ee0bdf64c892b332dfb7e1e2e",
+          "size": 341
+        },
+        "applications.txt": {
+          "sha256": "33bc8f07bacf74082fcb5f361eded1f6f9d3abcedcbe37ada2eb2ab4ae031732",
+          "size": 2821
+        }
+      },
+      "notice_commit": "ab21f1c70d263c683990a0aed446ad3bf09a2961"
+    },
+    "acl": {
+      "repository": "ACL4SSR/ACL4SSR",
+      "ref": "master",
+      "commit": "802e3abf065f8609e7d9073ba506158dbe2ba6e7",
+      "files": {
+        "Clash/LocalAreaNetwork.list": {
+          "sha256": "0789504d97d8f5b14513c529c61c06f4f862c5cfd20f7cb30bbcd38357e54468",
+          "size": 1217
+        },
+        "Clash/UnBan.list": {
+          "sha256": "016837560f1f0eeb576f81600c95b547bd82e27ba27a175a3b5010de9bd18ffa",
+          "size": 1048
+        },
+        "Clash/BanAD.list": {
+          "sha256": "27a5f6d018d428409d8da5d9f390a46298d505ae4941bb8172f052055abe7262",
+          "size": 15550
+        },
+        "Clash/ChinaDomain.list": {
+          "sha256": "362edd1f605742b360eaf138f151d7eea96cc17f20ef12da73acbfb80c350e08",
+          "size": 17251
+        },
+        "Clash/ProxyGFWlist.list": {
+          "sha256": "72d5f97cb3adedd7ef632962effda4aa3b9953da20427cd6050d55d1184de5ea",
+          "size": 191112
+        },
+        "README.md": {
+          "sha256": "67026f98f57b2f7d332dcfb3cf0fa7bb018f01db6b05ea468411a2a7bec70b7a",
+          "size": 9163
+        }
+      }
+    },
+    "meta": {
+      "repository": "MetaCubeX/meta-rules-dat",
+      "ref": "meta",
+      "commit": "9c8e9f56b6ffadab05bfc933011b2bfc2f4f8288",
+      "files": {
+        "geo/geosite/classical/private.list": {
+          "sha256": "8093ba1a1fb28dc5330528af97740262910869378b4fd8286c35fbb00197f1ca",
+          "size": 4235
+        },
+        "geo/geosite/classical/category-ads-all.list": {
+          "sha256": "67668cb152d701026f9596ca8470d9bad337bb1be794fddadcd3993e8b944ba8",
+          "size": 27476
+        },
+        "geo/geosite/classical/geolocation-!cn.list": {
+          "sha256": "86e4a8dbc85935667d95f2122a78f7ceec3e341558508a63df20bb71156b6bbb",
+          "size": 785362
+        },
+        "geo/geosite/classical/google.list": {
+          "sha256": "44ea13a45caa976c6dd81a8732787a9f3e4d278ffa1b25b194ac566430c91c9a",
+          "size": 30230
+        },
+        "geo/geosite/classical/telegram.list": {
+          "sha256": "619df30317e41c5958311c5d4f76abe1bfa45ae4ba399129a0fec2fe4edd43d9",
+          "size": 545
+        },
+        "geo/geosite/classical/netflix.list": {
+          "sha256": "5d64af1c1a3f9f0edaf35aca1828c2aba7b33345e1d7ddfaa685bf30303b1b40",
+          "size": 985
+        },
+        "geo/geosite/classical/github.list": {
+          "sha256": "6ba2fbc533c3cd97d2c420d2044994408fe95ea7cbecf82065aa5ab3c6f52c54",
+          "size": 2562
+        },
+        "geo/geosite/classical/openai.list": {
+          "sha256": "5aa9a38539026b693135c769f6db10962345ac46860977cb168a52c9d5bfbf6d",
+          "size": 812
+        },
+        "geo/geosite/classical/youtube.list": {
+          "sha256": "b50b8cabe440d8b3a4c0e7385e2a9ac59a77ba784a2e150f1d3aebd94790149f",
+          "size": 4874
+        },
+        "geo-lite/geosite/classical/cn.list": {
+          "sha256": "0bccb605da6c7a22e70219cc410557ba38c81d1c8de5eceac6f1f478280945a2",
+          "size": 98731
+        },
+        "geo/geoip/private.list": {
+          "sha256": "9ea58a874fd295cc44b401727732dd95b25ca8a573c823b80b4cd64ea4ff1973",
+          "size": 223
+        },
+        "geo/geoip/cn.list": {
+          "sha256": "be18e361f53bf66d421034ff3d2cf81c3a041ff7e87f542462c7c37e70abc96f",
+          "size": 153161
+        },
+        "geo/geoip/telegram.list": {
+          "sha256": "b0a0a5a4280f2c713a26bf1763317be5aefeda02e4e78dab7c2efbda02663181",
+          "size": 192
+        }
+      },
+      "notice_commit": "4178770badecb1b349fbcd62c737e0d7a2079729"
+    },
+    "personal": {
+      "repository": "Forlooong/clash-rules-mrs",
+      "commit": "cc1652f0b4ba8db0491f76b9e9515f7e042ab189",
+      "files": {
+        "personal/direct.yaml": {
+          "sha256": "52f8c7b62b119678dda9bf52585fafc35a4bc813b519bfa0d733472677c49056"
+        },
+        "personal/proxy.yaml": {
+          "sha256": "11a042ebe6a65d46b4be027d8c3f5d64bb3ab2ed549ee44068f72d110383aa9e"
+        }
+      }
+    }
+  },
+  "providers": {
+    "acl-direct-ipcidr": {
+      "path": "acl4ssr/direct-ipcidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "acl-unban-domain": {
+      "path": "acl4ssr/unban-domain.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "apple": {
+      "path": "loyalsoldier/apple.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "cncidr": {
+      "path": "loyalsoldier/cncidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "direct": {
+      "path": "loyalsoldier/direct.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "gfw": {
+      "path": "loyalsoldier/gfw.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "google": {
+      "path": "loyalsoldier/google.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "greatfire": {
+      "path": "loyalsoldier/greatfire.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "icloud": {
+      "path": "loyalsoldier/icloud.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "lancidr": {
+      "path": "loyalsoldier/lancidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "personal-direct-domain": {
+      "path": "personal/personal-direct-domain.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "private": {
+      "path": "loyalsoldier/private.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "proxy": {
+      "path": "loyalsoldier/proxy.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "reject": {
+      "path": "loyalsoldier/reject.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "services-proxy": {
+      "path": "services/services-proxy.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "telegramcidr": {
+      "path": "loyalsoldier/telegramcidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "tld-not-cn": {
+      "path": "loyalsoldier/tld-not-cn.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    }
+  },
+  "files": {
+    "cidr-report.json": {
+      "size": 7082,
+      "sha256": "a096e71d1c3e5c1ed1c4a836cd19a15df79ec7329815c6fbcd4e5104ad154d95"
+    },
+    "inline-rules.json": {
+      "size": 14380,
+      "sha256": "1d2a2cbe2b085510ca5e791130f3bd15e7d831a8f33e099c756d189fd0fbd3f7"
+    },
+    "conflict-report.json": {
+      "size": 24116394,
+      "sha256": "b1c8b8c4b07aa96001d83e39d8890d5f9e91bef93fa95a8c4be7735680c0415e"
+    },
+    "build-report.json": {
+      "size": 122585,
+      "sha256": "d10f617489d477b69c09dd30a6f0ea53ca3a9b44738e36ec958fa07acad0eeea"
+    },
+    "sources.json": {
+      "size": 5931,
+      "sha256": "8f7cf061fb44b45c5c3a1254b117796f7cd312b4d762f4e768e5f843fdb57a86"
+    },
+    "source-archive.tar.gz": {
+      "size": 2620924,
+      "sha256": "350b5f3086be50cdf4343ae62030e0934e7810d5b741bf1cffbf2ac34c11ac42"
+    },
+    "acl4ssr/unban-domain.mrs": {
+      "size": 421,
+      "sha256": "df2f889a43f045d75aa98bb389f30dbb62942934987da65c4c7f4b4b72058fd0"
+    },
+    "acl4ssr/direct-ipcidr.mrs": {
+      "size": 118,
+      "sha256": "8e2a592112e092ce6b28493674385196f6956a211bd8afdfaede78f05fbef4c2"
+    },
+    "licenses/NOTICE.md": {
+      "size": 2034,
+      "sha256": "6c2e4bbebb792942c3217d8a82d1e71fe78f6d1e4858b93223e36271237814c0"
+    },
+    "licenses/loyal-README.md": {
+      "size": 15074,
+      "sha256": "f3ac534ffc0c56bdce43b8e9d06dacf774be15c02dfc82dedeb2d9f020b23c48"
+    },
+    "licenses/meta-LICENSE": {
+      "size": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "licenses/acl-README.md": {
+      "size": 9163,
+      "sha256": "67026f98f57b2f7d332dcfb3cf0fa7bb018f01db6b05ea468411a2a7bec70b7a"
+    },
+    "licenses/acl-LICENSE": {
+      "size": 20138,
+      "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5"
+    },
+    "licenses/loyal-LICENSE": {
+      "size": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "licenses/meta-README.md": {
+      "size": 11360,
+      "sha256": "f8331ea1270bab8df1be58c6bd36064eacb80b4c98d1a243266617d5b544dd4a"
+    },
+    "services/services-proxy.mrs": {
+      "size": 2882,
+      "sha256": "41569e2621ef2c53272f9c15dceaa3e66af9b9a5ad69c0d1773c2c69ed9785e6"
+    },
+    "personal/personal-direct-domain.mrs": {
+      "size": 92,
+      "sha256": "7bfa15f4799f353f26259940d3625ee1d4d362d85abf2dc975c259fd349d3410"
+    },
+    "loyalsoldier/gfw.mrs": {
+      "size": 34648,
+      "sha256": "9da2377791285cb4828df85cc4c8da75517387b2d8eae3ec59bee7b1bcf747dd"
+    },
+    "loyalsoldier/tld-not-cn.mrs": {
+      "size": 4517,
+      "sha256": "1b3941da04d537521251fb76b3ec7a29f0aaefb4048a5f79f4542442c7025af5"
+    },
+    "loyalsoldier/lancidr.mrs": {
+      "size": 155,
+      "sha256": "08bd2160eb3205e71727581ae5558af7be91e9da33bd398795d981c9e153d28d"
+    },
+    "loyalsoldier/telegramcidr.mrs": {
+      "size": 145,
+      "sha256": "d121af95b9aeca3d8c29b2112d5e6685b2a6716383df8ae31b5fbb3408c527b3"
+    },
+    "loyalsoldier/direct.mrs": {
+      "size": 534998,
+      "sha256": "d00cbdc68b8c403e19479e28e488ba461bb9b302323bc1ab71ded4b2d422deb4"
+    },
+    "loyalsoldier/apple.mrs": {
+      "size": 1576,
+      "sha256": "e06224ff9fc6d3dd11cbe51ef4e37f9de41988043e32b50006fce18319d0ad2e"
+    },
+    "loyalsoldier/private.mrs": {
+      "size": 786,
+      "sha256": "2f287352d9d907315c02857421162b428127dac580840e3d27ea2219cbd32a0a"
+    },
+    "loyalsoldier/icloud.mrs": {
+      "size": 576,
+      "sha256": "e1e74cef80c6eab2cd66fb4b10034e066ccf7d5225441f58837f557fe24f0133"
+    },
+    "loyalsoldier/greatfire.mrs": {
+      "size": 205,
+      "sha256": "9cbe10fe864c6e9748c325b5e086334600e6d1c88f190103f5e7c8ff36aaf580"
+    },
+    "loyalsoldier/reject.mrs": {
+      "size": 1866163,
+      "sha256": "9d0efdc7716bd086e848dfa7e2ee36bfd838e90505a0193c6d5842a129debdbf"
+    },
+    "loyalsoldier/proxy.mrs": {
+      "size": 193945,
+      "sha256": "8d0e57357f10a491d725198c178331f7438bc1a3fd80124c23343f9af6c096fc"
+    },
+    "loyalsoldier/cncidr.mrs": {
+      "size": 37538,
+      "sha256": "d95b3d125f6c74ce3c15e19ef794f142de91e21c3b8fb7767e76aebfabff5149"
+    },
+    "loyalsoldier/google.mrs": {
+      "size": 7235,
+      "sha256": "b8b299320182b9fb617f9cb6a81cfe6579929eb0d075091f2f4baa37e8f8b7c5"
+    }
+  },
+  "counts": {
+    "loyal/reject": 193644,
+    "loyal/icloud": 53,
+    "loyal/apple": 165,
+    "loyal/google": 112,
+    "loyal/proxy": 27233,
+    "loyal/direct": 110614,
+    "loyal/private": 130,
+    "loyal/gfw": 4429,
+    "loyal/greatfire": 11,
+    "loyal/tld-not-cn": 829,
+    "loyal/telegramcidr": 12,
+    "loyal/cncidr": 9609,
+    "loyal/lancidr": 18,
+    "loyal/applications": 98,
+    "acl/LocalAreaNetwork": 37,
+    "acl/UnBan": 31,
+    "acl/BanAD": 588,
+    "acl/ChinaDomain": 635,
+    "acl/ProxyGFWlist": 6986,
+    "meta/geosite/private": 131,
+    "meta/geosite/category-ads-all": 903,
+    "meta/geosite/geolocation-!cn": 27340,
+    "meta/geosite/google": 1077,
+    "meta/geosite/telegram": 21,
+    "meta/geosite/netflix": 28,
+    "meta/geosite/github": 65,
+    "meta/geosite/openai": 23,
+    "meta/geosite/youtube": 178,
+    "meta/geosite/cn-lite": 3691,
+    "meta/geoip/private": 18,
+    "meta/geoip/cn": 9609,
+    "meta/geoip/telegram": 12,
+    "personal/direct": 3
+  },
+  "provider_counts": {
+    "acl-direct-ipcidr": 9,
+    "acl-unban-domain": 31,
+    "apple": 162,
+    "cncidr": 9609,
+    "direct": 110774,
+    "gfw": 4410,
+    "google": 845,
+    "greatfire": 11,
+    "icloud": 53,
+    "lancidr": 18,
+    "personal-direct-domain": 3,
+    "private": 133,
+    "proxy": 26964,
+    "reject": 194378,
+    "services-proxy": 303,
+    "telegramcidr": 12,
+    "tld-not-cn": 829
+  },
+  "distribution_license": "GPL-3.0; ACL-only collections retain CC-BY-SA-4.0"
+}
