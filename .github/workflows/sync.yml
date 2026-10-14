@@ -40,28 +40,29 @@ jobs:
           set -euo pipefail
           gh release download v1.19.32 --repo MetaCubeX/mihomo --pattern 'mihomo-linux-amd64-compatible-v1.19.32.gz' --output mihomo.gz
           gzip -t mihomo.gz
-          gzip -dc mihomo.gz > mihomo
-          sudo install -m 0755 mihomo /usr/local/bin/mihomo
-          mihomo -v
+          gzip -dc mihomo.gz > "$RUNNER_TEMP/mihomo"
+          sudo install -m 0755 "$RUNNER_TEMP/mihomo" /usr/local/bin/mihomo
+          test -x /usr/local/bin/mihomo
+          /usr/local/bin/mihomo -v
       - name: Build pinned four-source snapshot and legacy compatibility output
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_ID: rules-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -euo pipefail
-          python3 scripts/four_sources.py
+          python3 scripts/four_sources.py --mihomo /usr/local/bin/mihomo
           loyal_sha="$(python3 -c 'import json; print(json.load(open("out/build-manifest.json"))["sources"]["loyal"]["commit"])')"
           mv out snapshot-out
           BASE_URL="https://raw.githubusercontent.com/Loyalsoldier/clash-rules/$loyal_sha" bash scripts/build.sh
           test "$(find out/loyalsoldier -maxdepth 1 -name '*.mrs' | wc -l)" -eq 13
-          mihomo -t -d "$PWD" -f out/smoke.yaml
+          /usr/local/bin/mihomo -t -d "$PWD" -f out/smoke.yaml
           mv out compat-out
           mv snapshot-out out
-          python3 scripts/test_core.py
+          python3 scripts/test_core.py --mihomo /usr/local/bin/mihomo
       - name: Prepare v2 from the same fixed production commits
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 scripts/build_balanced.py --sources out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --prepare-only
+        run: python3 scripts/build_balanced.py --sources out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --mihomo /usr/local/bin/mihomo --prepare-only
       - name: Cache immutable upstream archives
         uses: actions/cache@v4
         with:
@@ -74,22 +75,22 @@ jobs:
         run: |
           set -euo pipefail
           audit_exit=0
-          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit/original || audit_exit=$?
+          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo /usr/local/bin/mihomo --output audit/original || audit_exit=$?
           # A reported source defect proceeds only to deterministic repair.
           # Tool failures or unreported/unknown errors cannot authorize a build.
           test "$audit_exit" -le 1
           test -f audit/original/manifest.json
       - name: Rebuild defective MRS and audit every effective projection
         run: |
-          python3 scripts/repair_sources.py --audit audit/original --sources balanced-out/sources.json --mihomo mihomo --output audit/repairs
-          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit --repairs audit/repairs
+          python3 scripts/repair_sources.py --audit audit/original --sources balanced-out/sources.json --mihomo /usr/local/bin/mihomo --output audit/repairs
+          python3 scripts/audit_sources.py --sources balanced-out/sources.json --mihomo /usr/local/bin/mihomo --output audit --repairs audit/repairs
       - name: Build v2 and exercise full rules and DNS in pinned core
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 scripts/build_balanced.py --sources balanced-out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --audit audit
-          python3 scripts/test_core.py --snapshot-dir balanced-out
-          python3 scripts/test_dns_core.py
+          python3 scripts/build_balanced.py --sources balanced-out/sources.json --build-id rules-${{ github.run_id }}-${{ github.run_attempt }}-v2 --mihomo /usr/local/bin/mihomo --audit audit
+          python3 scripts/test_core.py --snapshot-dir balanced-out --mihomo /usr/local/bin/mihomo
+          python3 scripts/test_dns_core.py --mihomo /usr/local/bin/mihomo
       - name: Upload candidate build for inspection
         if: always()
         uses: actions/upload-artifact@v4
