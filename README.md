@@ -22,7 +22,7 @@ v2 是独立候选通道：**关闭广告拦截，国内直连、其余代理，
 
 这约束 Mihomo 接管的连接。系统代理不会接管所有应用，浏览器自带 DNS、绕过代理的进程及局域网 system 解析不在全设备保证内。Binance 业务直连与可信 DNS 可以验证，但可信地址仍被 TLS 重置时，规则不能保证恢复网页。
 
-清单 `schema_version=2, policy_version=balanced-v2`；入口 `release/candidate-v2.json`（预览 `candidates/candidate-v2.json`），不覆盖 v1 的 `candidate.json`。迁移用 `sb rules update --channel v2`；状态、候选通道、规则构建、DNS、模板及完整订阅通过同一事务切换，`sb rollback <transaction-id>` 同时恢复。仅更新 MRS URL 不能完成迁移。
+清单 `schema_version=2, policy_version=balanced-v2`；入口 `release/candidate-v2.json`（预览 `candidates/candidate-v2.json`），不覆盖 v1 的 `candidate.json`。迁移用 `sb rules update --channel v2`；状态、候选通道、规则构建、DNS、模板及完整订阅通过同一事务切换，`sb transaction rollback <transaction-id>` 同时恢复。仅更新 MRS URL 不能完成迁移。
 
 自定义 DNS 通过随内联元数据交付的域名索引检查与自动策略的交集，不能仅因解析器写了 `#节点选择` 就放行。无法证明不相交的通配符、后缀与复杂正则组合会保留旧配置并报告；精确域名更容易验证。
 
@@ -121,7 +121,7 @@ Windows 可传 --mihomo 指定官方 Windows 二进制。--offline 仅用于重�
 
 ## 历史 v1 生成器适配与灰度
 
-本节的 `/opt/proxy-stack` 命令仅适用于旧生成器，不是当前部署步骤。当前使用的 `sing-box/sbmanager` 通过上文 `sb rules update --channel v2` 与事务回滚管理规则和 DNS；本次本地修复与验证不会触发服务器迁移或发布。
+本节的 `/opt/proxy-stack` 命令仅适用于旧生成器，不是当前部署步骤。当前使用的 `sing-box/sbmanager` 通过上文 `sb rules update --channel v2` 与事务回滚管理规则和 DNS；发布候选本身不会迁移仍使用 v1 的安装，首次切换必须显式选择 v2。
 
 runtime/snapshot.py 不含节点或令牌。deployment 中的 systemd service/timer 每 15 分钟验证候选，网络下载不在订阅请求内执行。临时目录整批通过才更新 staged.json；无 active.json 时仍使用旧模式。
 
