@@ -1,146 +1,141 @@
-# Mihomo MRS：日常可用优先的 v2 分流
+# Clash / Mihomo 分流规则
 
-v2 是独立候选通道：**关闭广告拦截，国内直连、其余代理，个人例外优先**。仅保留一个“节点选择”组，不加入 DIRECT 自动回退。沿用系统代理，不启用 TUN。v1 仍可读取和回滚；候选发布与服务器实际启用是不同状态。
+面向日常使用的 Mihomo 规则项目：**国内直连、其余代理、个人例外优先，默认关闭广告拦截**。域名和 IP 规则编译为 MRS，由配套的 [sing-box 订阅生成器](https://github.com/Forlooong/sing-box) 生成可导入客户端的完整配置。
 
-## v2 的来源与顺序
+本文说明当前 **v2** 方案。使用系统代理接入，默认关闭 TUN；代理流量统一交给一个手动“节点选择”组。
 
-主要分类使用 MetaCubeX 的 `geolocation-cn`、private、CN IP，以及 Google、YouTube、Telegram、Netflix、GitHub、OpenAI。Loyalsoldier 和 ACL4SSR 的整个固定生产分支继续审计，但不自动取并集。没有广告匹配、上游进程直连、整表 UnBan、通用代理表或 ASN 出口规则。
+## 设计层级
 
-顺序固定为：回环 → 个人 DIRECT → 个人代理 → 私网 → 明确海外服务 → Telegram IP → 国内域名 → 国内 IP → MATCH 节点选择。国内 IP 规则允许主动解析；私网和 Telegram IP 使用 `no-resolve`。个人规则文件保持原接口，Binance、Bybit Global 与 Bybit 的根域名和子域名直连。
+与配套生成器组合后的完整配置分为六层：
 
-`geolocation-cn` 也不是安全白名单。`scripts/shared-platform-roots.json` 明确剔除已识别的共享云/CDN 整根规则，记录来源与原因，保留具体业务子域。没有按 `cloud`/`cdn` 字符串批量删域名。国内 IP 兜底仍可令其国内地址直连；不声称已识别互联网上全部共享平台。
+| 层级 | 配置段 | 职责 |
+| :--- | :--- | :--- |
+| 节点层 | `proxies` | 由订阅生成器导出已启用、兼容 Mihomo 的节点配置 |
+| 内核层 | 通用配置、`profile`、`tun` | 本地端口、并发、选择记忆；默认规则模式、关闭 TUN |
+| 解析层 | `dns` | Fake-IP、国内外 DoH 分流、节点域名的独立解析 |
+| 策略层 | `proxy-groups` | 唯一的“节点选择”组，手动选择代理出口 |
+| 规则源 | `rule-providers` | 加载 MRS；DNS 所需的辅助匹配以内嵌 classical 规则提供 |
+| 执行层 | `rules` | 从上到下匹配，决定直连或使用代理节点 |
 
-## v2 的 DNS 与消费接口
+节点由生成器管理，本仓库负责规则构建和规则、DNS 的装配。正则等不能无损转换为 MRS 的条件会保留在最终配置中。
 
-`runtime/snapshot.py` 只装配规则与 MRS；最终订阅编译必须再调用 `runtime/dns.py::assemble_dns`，并以 `sort_keys=False` 输出 YAML。实际集成目标是 `sing-box/sbmanager`，其内置模块与这里同步。
+## 默认链路
 
-- 国内域名：国内 DoH，经 DIRECT；节点域名与解析器引导：独立的 IP 地址 DoH，经 DIRECT。
-- 未分类、明确海外、个人境外直连域名：Cloudflare/Google DoH，经“节点选择”。`direct-nameserver` 同样使用代理 DoH，开启 `direct-nameserver-follow-policy`。
-- 不设置国内 fallback。代理 DNS 断线且无有效缓存时，查询失败，不自动换成国内 DNS。
-- DNS policy 按个人、私网、服务、国内顺序在最终编译重建。正则/关键词使用内联 classical provider；域名和 IP 仍为 MRS，不多下载 YAML。
-- 迁移旧自动 DNS 策略，保留可证明不冲突的自定义加密代理解析；冲突拒绝激活。进程、端口、个人 IP 规则无法完整表达 DNS 意图，构建报告记录边界。
-
-这约束 Mihomo 接管的连接。系统代理不会接管所有应用，浏览器自带 DNS、绕过代理的进程及局域网 system 解析不在全设备保证内。Binance 业务直连与可信 DNS 可以验证，但可信地址仍被 TLS 重置时，规则不能保证恢复网页。
-
-清单 `schema_version=2, policy_version=balanced-v2`；入口 `release/candidate-v2.json`（预览 `candidates/candidate-v2.json`），不覆盖 v1 的 `candidate.json`。迁移用 `sb rules update --channel v2`；状态、候选通道、规则构建、DNS、模板及完整订阅通过同一事务切换，`sb transaction rollback <transaction-id>` 同时恢复。仅更新 MRS URL 不能完成迁移。
-
-自定义 DNS 通过随内联元数据交付的域名索引检查与自动策略的交集，不能仅因解析器写了 `#节点选择` 就放行。无法证明不相交的通配符、后缀与复杂正则组合会保留旧配置并报告；精确域名更容易验证。
-
-## v2 全量审计与发布门槛
-
-固定三个生产分支提交，下载完整归档，重建 Git blob/tree SHA 核对目录完整性。逐条读取规范文本，包括 ASN 和其他客户端格式；为不支持的语法明确记录排除理由，未知语法阻止发布。逐个比较文本、YAML、rule 和 MRS 的可表达投影；IP 比较覆盖区间，域名区分精确、后缀、仅子域与正则。MRS 解码器用固定核心编译/反编译夹具交叉核对。复杂正则/进程/端口交集无法证明时标为未穷尽，实际配置回归补充。
-
-客户端只取 MRS、内联谓词及小型元数据（总上限 8 MiB）。完整清单、逐条原文、风险、排除、投影报告和对应源码通过独立 `audit-<build-id>.tar.gz` Release 附件交付；运行清单绑定审计 manifest 的 SHA-256。缺文件、未知语法、投影不一致、必需集合为空或核心行为回归失败均阻止候选发布。
-
-构建最后生成 `artifact-manifest.json`，绑定全部审计报告与源码归档的大小和哈希；发布前逐项复核。`routing-changes.json.gz` 对同次上游输入的 v1 重建基线与 v2 比较完整规则链、域名锚点/子域边界和 IP 覆盖，明确标出进程、IP、复杂正则带来的不确定性。这是迁移策略报告，不冒充当前线上状态或所有网站的实际连接测试。审计失败时 CI 仍上传诊断附件，候选入口保持旧版本。
-
-### 修复上游派生 MRS，不豁免错误
-
-原始审计保存在 `audit/original`。已确认的 ACL 生成器错误把 `DOMAIN-SUFFIX,` 等前缀当成了域名字符；修复从该提交真正用于生成此文件的 classical 文本重新提取可表达的域名规则，逐个编译和核对。只含关键词或正则的分类，其域名投影是空集合，原 classical 谓词必须保留；不能填入占位域名，也不能将零字节文件视为有效 MRS。
-
-经典 `DOMAIN`/`DOMAIN-SUFFIX` 中的星号是字面字符，不能转换成 domain provider 的通配符；这些谓词同样完整保留在 classical 记录中。空集合使用无终结节点的 MRS 编码，并在固定 Mihomo v1.19.32 中逐项验证 provider 实际加载、规则数为零和不误匹配。该版本的命令行转换器主动拒绝零规则集合，因此报告明确记录这项限制，空集合不宣称通过了命令行反编译。
-
-`audit/repairs` 保存真实重建文件与原始哈希、来源文本哈希、新哈希及核心验证证据。再次审计时仍重建原始 Git 树以确认目录完整性，另外标记实际验证的修复文件；最终 `audit/manifest.json` 的通过状态只表示修复后的全部有效文件已通过，不会改写原始失败报告。未知故障、文本损坏或修复后仍不一致继续阻止构建。没有按哈希忽略错误的隔离放行表。
-
-依赖 Python 3.12、PyYAML 6.0.2、zstandard 0.24.0、Mihomo v1.19.32：
-
-```sh
-python -m unittest discover -s tests -v
-python scripts/four_sources.py --build-id rules-local-v1
-python scripts/build_balanced.py --sources out/sources.json --build-id rules-local-v2 --prepare-only
-python scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit/original
+```text
+应用请求 → 本机 Mihomo → rules 从上到下匹配
+                         ├─ DIRECT → 直连目标服务
+                         └─ 节点选择 → 当前选中的节点 → 目标服务
 ```
 
-原始审计失败时，先阅读 `audit/original/errors.json`。只有修复器明确支持的故障可重建；修复失败不能跳过：
+“节点选择”使用 `select`，默认模板开启选择记忆。在客户端切换这个组即可更换代理线路；所有命中代理规则的流量共用当前节点。未命中前面规则的请求，最终由 `MATCH` 交给这个组。
 
-```sh
-python scripts/repair_sources.py --audit audit/original --sources balanced-out/sources.json --mihomo mihomo --output audit/repairs
-python scripts/audit_sources.py --sources balanced-out/sources.json --mihomo mihomo --output audit --repairs audit/repairs
-python scripts/build_balanced.py --sources balanced-out/sources.json --build-id rules-local-v2 --audit audit
-python scripts/test_core.py --snapshot-dir balanced-out
-python scripts/test_dns_core.py --mihomo mihomo
+组内只包含实际节点，不加入 DIRECT 自动回退。代理节点不可用时，需要切换到另一个可用节点。
+
+## 分流规则
+
+规则按以下优先级排列，**首次命中即决定出口**：
+
+| 顺序 | 匹配内容 | 出口 |
+| :--- | :--- | :--- |
+| 1 | 必要回环：`localhost`、`127.0.0.0/8`、`::1/128` | DIRECT |
+| 2 | 个人直连规则 | DIRECT |
+| 3 | 个人代理规则 | 节点选择 |
+| 4 | 私网与局域网 | DIRECT |
+| 5 | Google、YouTube、Telegram、Netflix、GitHub、OpenAI | 节点选择 |
+| 6 | Telegram IP | 节点选择 |
+| 7 | 国内域名 | DIRECT |
+| 8 | 国内 IP | DIRECT |
+| 9 | `MATCH`：其余请求 | 节点选择 |
+
+国内域名以 MetaCubeX 的 `geolocation-cn` 为主。已识别的共享云/CDN 整根后缀会被[过滤](scripts/shared-platform-roots.json)，保留明确的业务子域；国内 IP 兜底仍然生效。国内 IP 规则允许主动解析，私网和 Telegram IP 规则使用 `no-resolve`。
+
+默认规则不加载广告表、上游整表进程直连或整表 UnBan。日常遇到个别站点需要调整时，优先使用个人规则。
+
+## DNS 如何分流
+
+**业务连接走哪里，与域名向谁查询，是两个独立决定。** 默认使用 Fake-IP，实际解析按以下策略进行：
+
+| 查询对象 | 解析方式 | DNS 查询出口 |
+| :--- | :--- | :--- |
+| 个人规则中的域名，包括直连例外 | Cloudflare / Google DoH | 节点选择 |
+| 明确海外服务、未分类域名 | Cloudflare / Google DoH | 节点选择 |
+| 其余已知国内域名 | 国内 DoH | DIRECT |
+| `localhost`、普通私网与局域网名称 | 系统解析 | 跟随系统设置 |
+| 代理节点域名、解析器引导 | 独立的国内 DoH | DIRECT |
+
+例如，个人规则中的币安采用以下路径：
+
+```text
+解析 binance.com → 节点选择 → Cloudflare / Google DoH
+访问 binance.com → DIRECT → 目标服务器
 ```
 
-Windows 为涉及核心的命令传 `--mihomo <完整路径>`。规则回归使用完整产物，追踪出口连接本机 mock；另有真实核心 DNS 冷启动、父域/子域优先级、可信解析后的业务直连、主动 IP 解析及代理断线测试。消费端还验证遗漏 DNS 装配、排序持久化、哈希损坏、旧模板迁移及整体事务回滚。旧通道数量阈值、不可覆盖标签和发布后哈希核验继续保留。
+`direct-nameserver` 同样使用代理 DoH，并通过 `direct-nameserver-follow-policy` 让国内域名遵循国内解析策略。代理不可用且没有有效 DNS 缓存时，相关解析会失败，不会自动退回国内 DNS。
 
-下文记录 **v1 兼容通道**；其广告和旧分流顺序不属于 v2。
-
-每日北京时间 **07:00**（UTC 23:00）同步 Loyalsoldier、ACL4SSR、MetaCubeX 和本仓库个人规则；提交个人规则、脚本或工作流也触发构建。每轮固定上游提交后从文本编译，使用 Mihomo v1.19.32。定时任务可能延迟，不保证每天有内容变化。
-
-## 来源范围
-
-| 来源 | 范围与处理 |
-|---|---|
-| Loyalsoldier/clash-rules | 原 13 个基础 MRS；applications 进程规则内嵌 |
-| ACL4SSR/ACL4SSR | LocalAreaNetwork、UnBan、BanAD、ChinaDomain、ProxyGFWlist；排除最后一个表的全部 IP |
-| MetaCubeX/meta-rules-dat | meta 分支；private、category-ads-all、geolocation-!cn、google、telegram、netflix、github、openai、youtube；cn 使用 geo-lite；IP 仅 private、cn、telegram |
-| personal/direct.yaml、proxy.yaml | 全部个人规则；当前 Binance/Bybit 后缀直连，代理表为空 |
-
-MetaCubeX 从 classical 文本读取，保留 domain-only 导出无法承载的正则。没有引入 Netflix IP、共享 CDN、云平台或 ASN 大范围表，也没有增加策略组。
-
-## 新快照与旧兼容入口
-
-新版用不可覆盖的 rules-<run-id>-<attempt> 标签发布，标签指向产物提交。新版全部 **rule-provider 文件为 MRS**。关键词、正则、进程和带选项的个人规则保存在 inline-rules.json，由订阅生成器随每日快照更新并内嵌到最终 YAML；JSON 不是 Mihomo rule-provider。
-
-- build-manifest.json：构建/来源提交、核心版本、Fake-IP 池、provider 路径、文件大小与 SHA-256。
-- inline-rules.json：个人直连/代理、本地、广告、applications、服务代理、通用代理、直连八个固定区段。
-- sources.json、build-report.json、conflict-report.json、cidr-report.json：来源、重复覆盖、冲突与规范化。
-- licenses：原始来源说明、CC BY-SA 4.0 文本及修改声明；见 [NOTICE](NOTICE.md)。
-- 融合产物采用 GPLv3，并保留 ACL 原始授权；source-archive.tar.gz 保留可重编的原文、转换源码及全部许可。解压后在 builder 目录安装依赖及指定版本 Mihomo，使用 --offline 重编。
-- GitHub Release：完整快照附件，远程文件与附件全部校验后才发布候选索引。
-
-测试分支只更新 **candidates/candidate.json**；主分支验收后更新 **release/candidate.json**。旧 release/loyalsoldier/*.mrs、applications.yaml、个人 YAML、manifest.json、clash-snippet.yaml 保留基础语义和原格式，不混入新融合结果。
+系统代理的覆盖范围取决于应用是否接入 Mihomo；浏览器独立 DNS、绕过代理的应用等需要另行配置，不能据此承诺全设备零泄漏。直连站点即使解析正确，也可能在 TCP 或 TLS 阶段失败，添加直连规则不等于保证网页可用。
 
 ## 使用与更新
 
-新版 provider 固定到同一个真实标签，例如：
+### 客户端
 
-    https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/<build-id>/loyalsoldier/direct.mrs
+1. 使用支持 MRS 的 Mihomo 客户端，导入生成器提供的 **Clash / Mihomo YAML 完整订阅**。本项目以 Mihomo `v1.19.32` 构建和验证。
+2. 在客户端选择“规则”模式，启用系统代理，保持 TUN 关闭。系统代理开关由客户端管理。
+3. 在“节点选择”中选一个可用节点。
+4. 开启完整订阅的自动更新，建议每 12 小时刷新一次。
 
-常用服务为 services/services-proxy.mrs，ACL 补充在 acl4ssr，个人规则在 personal。实际 URL、格式与 behavior 由清单生成。
+已有订阅继续使用原地址。`candidate-v2.json` 是供生成器读取的版本索引，不能作为客户端订阅导入。
 
-**完整订阅至少每 24 小时更新一次**，才能取得新快照。provider 的 interval=43200 只读取当前固定版本，不能自行切换构建。仅保存固定 MRS 地址而不更新完整订阅，将一直使用原版本。
+### 配套生成器
 
-顺序：必要本地引导 → 个人 DIRECT/代理 → private/lancidr → UnBan DIRECT → 广告 REJECT → applications/Apple → Google/常用服务/Telegram IP → 通用代理 → 直连 → gfw/greatfire/tld → cncidr → MATCH。只有一个手动“节点选择”组。
+已升级到支持 v2 的 `sing-box/sbmanager` 的服务器，可用以下命令启用 v2 并查看状态：
 
-自动 IP 源排除 198.18.0.0/16；198.18.0.0/15 保留剩余 198.19.0.0/16。个人显式冲突报错。跨策略不破坏性删除；关键词、正则、进程和 IP 的复杂交集由回归补充，报告不宣称穷尽语义分析。
+```sh
+sb rules update --channel v2
+sb rules status
+```
 
-## 构建与测试
+此后 `sb rules update` 沿用当前通道。更新分为三个环节：
 
-依赖 Python 3.12、PyYAML 6.0.2 与 Mihomo v1.19.32：
+| 环节 | 更新方式 |
+| :--- | :--- |
+| 仓库构建 | 计划每天北京时间 07:00 同步上游；提交个人规则也会触发构建，任务可能延迟 |
+| 服务器订阅 | 定时任务约每 15 分钟检查候选，通过校验后更新完整订阅 |
+| 客户端 | 刷新完整订阅，取得新的规则版本和 DNS 配置 |
 
-    python3 -m unittest discover -s tests -v
-    python3 scripts/four_sources.py --build-id rules-local
-    python3 scripts/test_core.py
+每份订阅中的 MRS URL 固定到同一个发布版本。provider 的 12 小时刷新只更新该固定地址；**获取新版本需要刷新完整订阅**。服务器更新失败时继续使用原配置，回滚方法见[维护指南](docs/maintenance.md#服务器更新与回滚)。
 
-构建实际编译全部 MRS，并以 Mihomo 加载完整配置。test_core 启动隔离核心，所有追踪出口连接本机 mock，采集 Rule/Payload/Chains；覆盖精确/后缀、个人例外、UnBan、广告、常用服务、Meta 正则及普通云主机负例，不访问真实节点或公共测试网站。
+## 添加个人规则
 
-Windows 可传 --mihomo 指定官方 Windows 二进制。--offline 仅用于重编已经固定提交且验证原文哈希的缓存输入；CI 每轮重新读取上游。
+| 文件 | 用途 |
+| :--- | :--- |
+| [personal/direct.yaml](personal/direct.yaml) | 强制业务直连 |
+| [personal/proxy.yaml](personal/proxy.yaml) | 强制使用“节点选择” |
 
-首次四来源构建建立基线。后续来源/产物数量变化超过 20% 或文件超过旧版两倍时阻断发布；workflow_dispatch 的 allow_count_change 可为已复核的数量变动做单次放行。核心回归与哈希校验不能通过该开关绕过。
+只填写匹配条件，出口由文件决定。下面是向直连文件追加规则的格式示例，修改时保留已有条目：
 
-## 历史 v1 生成器适配与灰度
+```yaml
+payload:
+  - DOMAIN-SUFFIX,example.com
+  - DOMAIN,api.example.net
+```
 
-本节的 `/opt/proxy-stack` 命令仅适用于旧生成器，不是当前部署步骤。当前使用的 `sing-box/sbmanager` 通过上文 `sb rules update --channel v2` 与事务回滚管理规则和 DNS；发布候选本身不会迁移仍使用 v1 的安装，首次切换必须显式选择 v2。
+`DOMAIN-SUFFIX` 匹配根域名及所有子域名，`DOMAIN` 只匹配指定域名。不要填写 `https://`、URL 路径，或在末尾再加 `DIRECT`、`节点选择`。代理文件使用相同格式；没有条目时保留现有的空字符串占位。
 
-runtime/snapshot.py 不含节点或令牌。deployment 中的 systemd service/timer 每 15 分钟验证候选，网络下载不在订阅请求内执行。临时目录整批通过才更新 staged.json；无 active.json 时仍使用旧模式。
+当前个人直连包含 `binance.com`、`bybit-global.com`、`bybit.com`。这些后缀覆盖它们的子域名，不代表覆盖平台使用的所有第三方服务。
 
-1. 备份正式 subscription.py 与有效缓存，禁止提交公开仓库。
-2. scripts/adapt_generator.py INPUT OUTPUT 对源码结构校验后生成适配版；生产结构改变则拒绝自动修改。安装 snapshot.py 到生成器同目录。
-3. 正式定时器读 release 候选；灰度使用 candidates 候选和受保护测试入口。
-4. Windows 使用独立自建测试配置，不改当前其他订阅。Android/iPhone 核实客户端版本及 MRS 支持后逐端验收。
-5. 客户端验收通过后才 activate，默认不自动激活第一版。
+**个人直连整段先于个人代理。** 如果把 `example.com` 放进直连后缀规则，再把 `api.example.com` 放进代理规则，子域仍会直连。避免两份文件中的范围重叠；文件内条目的书写顺序也不等同于最终跨规则类型的匹配顺序。
 
-服务器命令：
+提交修改后，等待构建和服务器更新完成，再刷新客户端完整订阅。只编辑本地文件或客户端缓存中的 MRS，不会更新仓库发布的规则。
 
-    python3 snapshot.py refresh --state /opt/proxy-stack/subgen/snapshot-state
-    python3 snapshot.py refresh --state /opt/proxy-stack/subgen/snapshot-state --candidate-url https://raw.githubusercontent.com/Forlooong/clash-rules-mrs/candidates/candidate.json
-    python3 snapshot.py verify --state /opt/proxy-stack/subgen/snapshot-state
-    python3 snapshot.py activate --state /opt/proxy-stack/subgen/snapshot-state --build-id <verified-build>
-    python3 snapshot.py disable --state /opt/proxy-stack/subgen/snapshot-state
+## 规则来源
 
-activate 创建 activation.enabled；此后验证成功才自动切换。disable 暂停后续自动激活，保留当前版本。回滚时 disable，再指定旧 build-id activate 并再次 disable，客户端刷新完整订阅。缓存至少保留 30 天、最近五版及 active/staged；远端标签和 Release 不自动删除。
+| 来源 | 本项目的用法 |
+| :--- | :--- |
+| [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat) | 主要分类来源：国内域名、私网、CN IP 和明确海外服务 |
+| [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules) | 全量审计与分类参考，v2 不整表合并 |
+| [ACL4SSR/ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | 全量审计与规则组织参考，v2 不整表合并 |
+| 本仓库个人规则 | 表达个人直连、代理例外，优先于上游分类 |
 
-保持唯一节点组、节点参数、永久地址和流量统计。规则装配器不再顺带修改 TUN、嗅探或 DNS；这些设置由完整订阅模板与编译阶段负责。
+每次构建固定上游提交，检查规则内容与派生格式，修复已识别的 MRS 生成错误后重新验证。构建、发布和订阅生成器通过 SHA-256 校验对应产物；完整审计与源码作为独立 Release 附件提供。
 
-构建通过不等于多端上线完成。真实 DNS 循环、代理出口、Netflix 播放和移动端兼容需记录实测；Cloudflare DNS ISP 本身不是泄漏证据。公开仓库永远不包含节点密钥、订阅令牌或私有生产配置。
+需要进一步了解时，可查看[构建、集成与维护](docs/maintenance.md)、[v1 兼容与历史生成器](docs/legacy-v1.md)、[发布版本](https://github.com/Forlooong/clash-rules-mrs/releases)及[来源与许可声明](NOTICE.md)。
