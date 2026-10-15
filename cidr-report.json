@@ -1,0 +1,351 @@
+[
+  {
+    "source": "loyal/lancidr",
+    "original": "0.0.0.0/8",
+    "normalized": "0.0.0.0/8",
+    "remaining": [
+      "0.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "10.0.0.0/8",
+    "normalized": "10.0.0.0/8",
+    "remaining": [
+      "10.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "127.0.0.0/8",
+    "normalized": "127.0.0.0/8",
+    "remaining": [
+      "127.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "169.254.0.0/16",
+    "normalized": "169.254.0.0/16",
+    "remaining": [
+      "169.254.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "172.16.0.0/12",
+    "normalized": "172.16.0.0/12",
+    "remaining": [
+      "172.16.0.0/12"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "192.0.0.0/24",
+    "normalized": "192.0.0.0/24",
+    "remaining": [
+      "192.0.0.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "192.0.2.0/24",
+    "normalized": "192.0.2.0/24",
+    "remaining": [
+      "192.0.2.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "192.168.0.0/16",
+    "normalized": "192.168.0.0/16",
+    "remaining": [
+      "192.168.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "198.18.0.0/15",
+    "normalized": "198.18.0.0/15",
+    "remaining": [
+      "198.19.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "198.51.100.0/24",
+    "normalized": "198.51.100.0/24",
+    "remaining": [
+      "198.51.100.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "203.0.113.0/24",
+    "normalized": "203.0.113.0/24",
+    "remaining": [
+      "203.0.113.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "fc00::/7",
+    "normalized": "fc00::/7",
+    "remaining": [
+      "fc00::/7"
+    ],
+    "private": true
+  },
+  {
+    "source": "loyal/lancidr",
+    "original": "fe80::/10",
+    "normalized": "fe80::/10",
+    "remaining": [
+      "fe80::/10"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,0.0.0.0/8,no-resolve",
+    "normalized": "0.0.0.0/8",
+    "remaining": [
+      "0.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,10.0.0.0/8,no-resolve",
+    "normalized": "10.0.0.0/8",
+    "remaining": [
+      "10.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,127.0.0.0/8,no-resolve",
+    "normalized": "127.0.0.0/8",
+    "remaining": [
+      "127.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,169.254.0.0/16,no-resolve",
+    "normalized": "169.254.0.0/16",
+    "remaining": [
+      "169.254.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,172.16.0.0/12,no-resolve",
+    "normalized": "172.16.0.0/12",
+    "remaining": [
+      "172.16.0.0/12"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,192.168.0.0/16,no-resolve",
+    "normalized": "192.168.0.0/16",
+    "remaining": [
+      "192.168.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR,198.18.0.0/16,no-resolve",
+    "normalized": "198.18.0.0/16",
+    "remaining": [],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR6,::1/128,no-resolve",
+    "normalized": "::1/128",
+    "remaining": [
+      "::1/128"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR6,fc00::/7,no-resolve",
+    "normalized": "fc00::/7",
+    "remaining": [
+      "fc00::/7"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR6,fe80::/10,no-resolve",
+    "normalized": "fe80::/10",
+    "remaining": [
+      "fe80::/10"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/LocalAreaNetwork",
+    "original": "IP-CIDR6,fd00::/8,no-resolve",
+    "normalized": "fd00::/8",
+    "remaining": [
+      "fd00::/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/ChinaDomain",
+    "original": "IP-CIDR,172.16.102.56/32,no-resolve",
+    "normalized": "172.16.102.56/32",
+    "remaining": [
+      "172.16.102.56/32"
+    ],
+    "private": true
+  },
+  {
+    "source": "acl/ChinaDomain",
+    "original": "IP-CIDR,185.188.32.1/28,no-resolve",
+    "normalized": "185.188.32.0/28",
+    "remaining": [
+      "185.188.32.0/28"
+    ],
+    "private": false
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "0.0.0.0/8",
+    "normalized": "0.0.0.0/8",
+    "remaining": [
+      "0.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "10.0.0.0/8",
+    "normalized": "10.0.0.0/8",
+    "remaining": [
+      "10.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "127.0.0.0/8",
+    "normalized": "127.0.0.0/8",
+    "remaining": [
+      "127.0.0.0/8"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "169.254.0.0/16",
+    "normalized": "169.254.0.0/16",
+    "remaining": [
+      "169.254.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "172.16.0.0/12",
+    "normalized": "172.16.0.0/12",
+    "remaining": [
+      "172.16.0.0/12"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "192.0.0.0/24",
+    "normalized": "192.0.0.0/24",
+    "remaining": [
+      "192.0.0.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "192.0.2.0/24",
+    "normalized": "192.0.2.0/24",
+    "remaining": [
+      "192.0.2.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "192.168.0.0/16",
+    "normalized": "192.168.0.0/16",
+    "remaining": [
+      "192.168.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "198.18.0.0/15",
+    "normalized": "198.18.0.0/15",
+    "remaining": [
+      "198.19.0.0/16"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "198.51.100.0/24",
+    "normalized": "198.51.100.0/24",
+    "remaining": [
+      "198.51.100.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "203.0.113.0/24",
+    "normalized": "203.0.113.0/24",
+    "remaining": [
+      "203.0.113.0/24"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "fc00::/7",
+    "normalized": "fc00::/7",
+    "remaining": [
+      "fc00::/7"
+    ],
+    "private": true
+  },
+  {
+    "source": "meta/geoip/private",
+    "original": "fe80::/10",
+    "normalized": "fe80::/10",
+    "remaining": [
+      "fe80::/10"
+    ],
+    "private": true
+  }
+]
