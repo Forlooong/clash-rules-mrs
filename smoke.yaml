@@ -1,0 +1,95 @@
+mixed-port: 7897
+mode: rule
+rule-providers:
+  reject:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/reject.mrs
+  icloud:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/icloud.mrs
+  apple:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/apple.mrs
+  google:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/google.mrs
+  proxy:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/proxy.mrs
+  direct:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/direct.mrs
+  private:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/private.mrs
+  gfw:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/gfw.mrs
+  greatfire:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/greatfire.mrs
+  tld-not-cn:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/loyalsoldier/tld-not-cn.mrs
+  telegramcidr:
+    type: file
+    behavior: ipcidr
+    format: mrs
+    path: ./out/loyalsoldier/telegramcidr.mrs
+  cncidr:
+    type: file
+    behavior: ipcidr
+    format: mrs
+    path: ./out/loyalsoldier/cncidr.mrs
+  lancidr:
+    type: file
+    behavior: ipcidr
+    format: mrs
+    path: ./out/loyalsoldier/lancidr.mrs
+  applications:
+    type: file
+    behavior: classical
+    format: yaml
+    path: ./out/loyalsoldier/applications.yaml
+  personal-direct-domain:
+    type: file
+    behavior: domain
+    format: mrs
+    path: ./out/personal/personal-direct-domain.mrs
+rules:
+- RULE-SET,reject,DIRECT
+- RULE-SET,icloud,DIRECT
+- RULE-SET,apple,DIRECT
+- RULE-SET,google,DIRECT
+- RULE-SET,proxy,DIRECT
+- RULE-SET,direct,DIRECT
+- RULE-SET,private,DIRECT
+- RULE-SET,gfw,DIRECT
+- RULE-SET,greatfire,DIRECT
+- RULE-SET,tld-not-cn,DIRECT
+- RULE-SET,telegramcidr,DIRECT
+- RULE-SET,cncidr,DIRECT
+- RULE-SET,lancidr,DIRECT
+- RULE-SET,applications,DIRECT
+- RULE-SET,personal-direct-domain,DIRECT
+- MATCH,DIRECT
