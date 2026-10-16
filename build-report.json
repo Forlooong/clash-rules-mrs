@@ -1,0 +1,163 @@
+{
+  "sources": {
+    "meta/geosite/private": {
+      "input": 131,
+      "domain": 130,
+      "inline": 1
+    },
+    "meta/geosite/geolocation-cn": {
+      "input": 5388,
+      "domain": 5330,
+      "excluded_top_level": 6,
+      "excluded_shared_platform": 49,
+      "inline": 3
+    },
+    "meta/geosite/google": {
+      "input": 1077,
+      "domain": 1061,
+      "excluded_top_level": 14,
+      "inline": 2
+    },
+    "meta/geosite/youtube": {
+      "input": 178,
+      "domain": 177,
+      "excluded_top_level": 1
+    },
+    "meta/geosite/telegram": {
+      "input": 21,
+      "domain": 21
+    },
+    "meta/geosite/netflix": {
+      "input": 28,
+      "domain": 24,
+      "inline": 4
+    },
+    "meta/geosite/github": {
+      "input": 65,
+      "domain": 65
+    },
+    "meta/geosite/openai": {
+      "input": 23,
+      "domain": 22,
+      "inline": 1
+    },
+    "meta/geoip/private": {
+      "input": 18,
+      "ipcidr": 18
+    },
+    "meta/geoip/cn": {
+      "input": 10009,
+      "ipcidr": 10009
+    },
+    "meta/geoip/telegram": {
+      "input": 12,
+      "ipcidr": 12
+    },
+    "personal/direct": {
+      "input": 3,
+      "domain": 3
+    }
+  },
+  "providers": {
+    "cn-domain": {
+      "input": 5330,
+      "exact_duplicates": 0,
+      "covered_domains": 7,
+      "output": 5323
+    },
+    "cn-ipcidr": {
+      "input": 10009,
+      "exact_duplicates": 0,
+      "covered_domains": 0,
+      "output": 10009
+    },
+    "personal-direct-domain": {
+      "input": 3,
+      "exact_duplicates": 0,
+      "covered_domains": 0,
+      "output": 3
+    },
+    "private-domain": {
+      "input": 130,
+      "exact_duplicates": 0,
+      "covered_domains": 0,
+      "output": 130
+    },
+    "private-ipcidr": {
+      "input": 18,
+      "exact_duplicates": 0,
+      "covered_domains": 0,
+      "output": 18
+    },
+    "services-proxy": {
+      "input": 1370,
+      "exact_duplicates": 172,
+      "covered_domains": 226,
+      "output": 972
+    },
+    "telegram-ipcidr": {
+      "input": 12,
+      "exact_duplicates": 0,
+      "covered_domains": 0,
+      "output": 12
+    }
+  },
+  "shared_platform_exclusions": 70,
+  "audit_scope": "upstream-with-verified-repairs",
+  "repair_overlay": {
+    "manifest_sha256": "aecfb3cb8bc9ad110747823b4c67c367da43668a8bdd66432ab3a825df83cda9",
+    "registered": 175,
+    "applied": 175,
+    "verified": 175,
+    "tree_verification_scope": "original_upstream_archive_only"
+  },
+  "dns_limitations": [],
+  "migration_comparison": {
+    "baseline": {
+      "tag": "rules-38832634174-1",
+      "manifest_sha256": "76f865cedaacb021c35027beff4efc34345e585438de1e0c52353a951daae50b",
+      "schema_version": 1,
+      "is_actual_online_version": false,
+      "description": "Current production-branch inputs rebuilt with the v1 policy; not an observation of the active client/server."
+    },
+    "scope": "First hostname predicate or eventual MATCH, conditional on all earlier connection-only/unproved predicates not matching.",
+    "anchor_count": 334650,
+    "tested_count": 669365,
+    "changed_first_match_count": 669070,
+    "changed_policy_count": 601155,
+    "conditional_change_count": 669070,
+    "transitions": [
+      {
+        "old": "DIRECT",
+        "new": "DIRECT",
+        "count": 10824
+      },
+      {
+        "old": "DIRECT",
+        "new": "节点选择",
+        "count": 211120
+      },
+      {
+        "old": "REJECT",
+        "new": "DIRECT",
+        "count": 1262
+      },
+      {
+        "old": "REJECT",
+        "new": "节点选择",
+        "count": 388646
+      },
+      {
+        "old": "节点选择",
+        "new": "DIRECT",
+        "count": 127
+      },
+      {
+        "old": "节点选择",
+        "new": "节点选择",
+        "count": 57091
+      }
+    ]
+  },
+  "audit_manifest_sha256": "fcbf25e0d4a8c41b8ef700806b8b2f1b576045fd42e0f5df48151c6182dabdda"
+}
