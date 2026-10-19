@@ -1,0 +1,305 @@
+{
+  "schema_version": 2,
+  "policy_version": "balanced-v2",
+  "build_id": "rules-39182335536-1-v2",
+  "tag": "rules-39182335536-1-v2",
+  "created_at": 1792371448,
+  "core_version": "Mihomo Meta v1.19.32 linux amd64 with go1.26.8 Wed Sep 30 16:55:19 UTC 2026\nUse tags: with_gvisor",
+  "fake_ip_pool": "198.18.0.0/16",
+  "sources": {
+    "loyal": {
+      "repository": "Loyalsoldier/clash-rules",
+      "ref": "release",
+      "commit": "4006d222fa41c7b3321f162d6a513568b5717141",
+      "files": {
+        "reject.txt": {
+          "sha256": "03bf087d02b07476846ae2446951f240547a8aa1a71667b31410f066f906aca5",
+          "size": 5626005
+        },
+        "icloud.txt": {
+          "sha256": "f1fb7e9d17400071bf77d853b2a3148ccb6a13d785cb97e73f1693142682b23f",
+          "size": 1141
+        },
+        "apple.txt": {
+          "sha256": "a47d516880dcf65f51d3b40e6a71c33253e0774bdc4a7ec0a0d0a09a4dd522a2",
+          "size": 5424
+        },
+        "google.txt": {
+          "sha256": "21a04f287800943b3fdfdef1f843173086171d9a0b5c9c33c3f73e1ec77d4c9e",
+          "size": 3368
+        },
+        "proxy.txt": {
+          "sha256": "b65dadaafa10d7f0915694ee86cbccf5969e4757be1352294a547ff91c3e9a7d",
+          "size": 621213
+        },
+        "direct.txt": {
+          "sha256": "887a3e47bd7d47629a62e6d7a55f420a960e83ee4cbcabe70bd8b4ef54ca912b",
+          "size": 2285366
+        },
+        "private.txt": {
+          "sha256": "49972ad557345dd1abe94a62892f06cbc5b4cef12bf8d7ac5beca454b5de9088",
+          "size": 3543
+        },
+        "gfw.txt": {
+          "sha256": "5dd8fbe9d9a9337ba6e4428709429dc2f857b9ed182b4a5bbc86c394bf9f8e48",
+          "size": 94987
+        },
+        "greatfire.txt": {
+          "sha256": "8a12d20e2da723146e5d84756f09362848abd3ef596ba6a03eae6b188075a4b6",
+          "size": 283
+        },
+        "tld-not-cn.txt": {
+          "sha256": "67ada67716332c39e0afea361dd4b2ad66f55d0a92d3d1b90a7a1d4d47283f62",
+          "size": 11820
+        },
+        "telegramcidr.txt": {
+          "sha256": "328fca88c675763111c7f7585ec504e5c21ab9afb7a8ce6df33b7ac01b8a3ee0",
+          "size": 274
+        },
+        "cncidr.txt": {
+          "sha256": "fb30f402e22ef9f21875ff201e7e5c558cd6a6626d26d6671e6a358d45519475",
+          "size": 219275
+        },
+        "lancidr.txt": {
+          "sha256": "82920b241dc328f1dc99849cf733ed8675a00a4ee0bdf64c892b332dfb7e1e2e",
+          "size": 341
+        },
+        "applications.txt": {
+          "sha256": "33bc8f07bacf74082fcb5f361eded1f6f9d3abcedcbe37ada2eb2ab4ae031732",
+          "size": 2821
+        }
+      },
+      "notice_commit": "ab21f1c70d263c683990a0aed446ad3bf09a2961"
+    },
+    "acl": {
+      "repository": "ACL4SSR/ACL4SSR",
+      "ref": "master",
+      "commit": "575637df38884575bfa523e95c17d0ee3be1676c",
+      "files": {
+        "Clash/LocalAreaNetwork.list": {
+          "sha256": "0789504d97d8f5b14513c529c61c06f4f862c5cfd20f7cb30bbcd38357e54468",
+          "size": 1217
+        },
+        "Clash/UnBan.list": {
+          "sha256": "016837560f1f0eeb576f81600c95b547bd82e27ba27a175a3b5010de9bd18ffa",
+          "size": 1048
+        },
+        "Clash/BanAD.list": {
+          "sha256": "27a5f6d018d428409d8da5d9f390a46298d505ae4941bb8172f052055abe7262",
+          "size": 15550
+        },
+        "Clash/ChinaDomain.list": {
+          "sha256": "362edd1f605742b360eaf138f151d7eea96cc17f20ef12da73acbfb80c350e08",
+          "size": 17251
+        },
+        "Clash/ProxyGFWlist.list": {
+          "sha256": "72d5f97cb3adedd7ef632962effda4aa3b9953da20427cd6050d55d1184de5ea",
+          "size": 191112
+        },
+        "README.md": {
+          "sha256": "67026f98f57b2f7d332dcfb3cf0fa7bb018f01db6b05ea468411a2a7bec70b7a",
+          "size": 9163
+        }
+      }
+    },
+    "meta": {
+      "repository": "MetaCubeX/meta-rules-dat",
+      "ref": "meta",
+      "commit": "7c782352439ce9ccaba53519ec816f82f52b6285",
+      "files": {
+        "geo/geosite/classical/private.list": {
+          "sha256": "01fbefdf20585ec8fde7747f4f9b8edcf5d76c55d39eb35b082021b57af6cff4",
+          "size": 4302
+        },
+        "geo/geosite/classical/category-ads-all.list": {
+          "sha256": "c507036f511cfb219a835644666590af384211b8f2117ef23b0fcce777afe569",
+          "size": 27476
+        },
+        "geo/geosite/classical/geolocation-!cn.list": {
+          "sha256": "78c30864e0114e970e7b07b9c4b1cb33d8a7d80f1154123cb8f017ef824f91ee",
+          "size": 786045
+        },
+        "geo/geosite/classical/google.list": {
+          "sha256": "10a973f2a625b536cc9dc57c6c57323b61045ff8931f5d567fc10d92c2a65e6d",
+          "size": 30230
+        },
+        "geo/geosite/classical/telegram.list": {
+          "sha256": "619df30317e41c5958311c5d4f76abe1bfa45ae4ba399129a0fec2fe4edd43d9",
+          "size": 545
+        },
+        "geo/geosite/classical/netflix.list": {
+          "sha256": "5d64af1c1a3f9f0edaf35aca1828c2aba7b33345e1d7ddfaa685bf30303b1b40",
+          "size": 985
+        },
+        "geo/geosite/classical/github.list": {
+          "sha256": "4ae6d52c0fa106f700585cca018905ba2b3ac296d57d83838c23c512eb269f0b",
+          "size": 2562
+        },
+        "geo/geosite/classical/openai.list": {
+          "sha256": "fde1e90c5fcc6418baad0eeffed9fb7a8a81fcedebe1b48cf3175c5ea7b59190",
+          "size": 837
+        },
+        "geo/geosite/classical/youtube.list": {
+          "sha256": "b50b8cabe440d8b3a4c0e7385e2a9ac59a77ba784a2e150f1d3aebd94790149f",
+          "size": 4874
+        },
+        "geo-lite/geosite/classical/cn.list": {
+          "sha256": "0bccb605da6c7a22e70219cc410557ba38c81d1c8de5eceac6f1f478280945a2",
+          "size": 98731
+        },
+        "geo/geoip/private.list": {
+          "sha256": "9ea58a874fd295cc44b401727732dd95b25ca8a573c823b80b4cd64ea4ff1973",
+          "size": 223
+        },
+        "geo/geoip/cn.list": {
+          "sha256": "07456bbfac8851a6a5149211841dcd0e7249e87bbcfab5a35891ec9eb1a8d22a",
+          "size": 159211
+        },
+        "geo/geoip/telegram.list": {
+          "sha256": "b0a0a5a4280f2c713a26bf1763317be5aefeda02e4e78dab7c2efbda02663181",
+          "size": 192
+        },
+        "geo/geosite/classical/geolocation-cn.list": {
+          "sha256": "2257e79347773a3f98f658ecb814b1a4ecaebe4ce070dd53252a4759bb224d8d",
+          "size": 141581
+        }
+      },
+      "notice_commit": "4178770badecb1b349fbcd62c737e0d7a2079729"
+    },
+    "personal": {
+      "repository": "Forlooong/clash-rules-mrs",
+      "commit": "e8cbc99509e561435eba521d7b02616f2be722e1",
+      "files": {
+        "personal/direct.yaml": {
+          "size": 243,
+          "sha256": "52f8c7b62b119678dda9bf52585fafc35a4bc813b519bfa0d733472677c49056"
+        },
+        "personal/proxy.yaml": {
+          "size": 85,
+          "sha256": "11a042ebe6a65d46b4be027d8c3f5d64bb3ab2ed549ee44068f72d110383aa9e"
+        }
+      }
+    }
+  },
+  "providers": {
+    "cn-domain": {
+      "path": "meta/cn-domain.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "cn-ipcidr": {
+      "path": "meta/cn-ipcidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "personal-direct-domain": {
+      "path": "personal/personal-direct-domain.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "private-domain": {
+      "path": "meta/private-domain.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "private-ipcidr": {
+      "path": "meta/private-ipcidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    },
+    "services-proxy": {
+      "path": "services/services-proxy.mrs",
+      "behavior": "domain",
+      "format": "mrs"
+    },
+    "telegram-ipcidr": {
+      "path": "meta/telegram-ipcidr.mrs",
+      "behavior": "ipcidr",
+      "format": "mrs"
+    }
+  },
+  "files": {
+    "NOTICE.md": {
+      "size": 2034,
+      "sha256": "6c2e4bbebb792942c3217d8a82d1e71fe78f6d1e4858b93223e36271237814c0"
+    },
+    "build-report.json": {
+      "size": 3819,
+      "sha256": "46d605880735d2655f7ed79d1185895799b97f9e05928a9447a175616f70d0f1"
+    },
+    "inline-rules.json": {
+      "size": 154179,
+      "sha256": "4fbb9d4eb228ca9e0e97bbf1b5aa61206ab0712638f2141c66eec553c3e2801a"
+    },
+    "meta/cn-domain.mrs": {
+      "size": 33664,
+      "sha256": "9742707b9ffc279fee60244fb859bba458feb2743010771e8fe4a9cfd05c4e9a"
+    },
+    "meta/cn-ipcidr.mrs": {
+      "size": 38566,
+      "sha256": "794f27a804c7c8272b2b9c6322aa04da34291611fd3b48bc4b761bf43b35da9a"
+    },
+    "meta/private-domain.mrs": {
+      "size": 781,
+      "sha256": "df452ab1bfb572f366f00001fa4525f16f137dc670aed2c60af0100dc397d3ec"
+    },
+    "meta/private-ipcidr.mrs": {
+      "size": 155,
+      "sha256": "08bd2160eb3205e71727581ae5558af7be91e9da33bd398795d981c9e153d28d"
+    },
+    "meta/telegram-ipcidr.mrs": {
+      "size": 145,
+      "sha256": "d121af95b9aeca3d8c29b2112d5e6685b2a6716383df8ae31b5fbb3408c527b3"
+    },
+    "personal/personal-direct-domain.mrs": {
+      "size": 92,
+      "sha256": "7bfa15f4799f353f26259940d3625ee1d4d362d85abf2dc975c259fd349d3410"
+    },
+    "services/services-proxy.mrs": {
+      "size": 8525,
+      "sha256": "8b943bc2905a17ce0c46b3ff6cc961e963f308e1475bec0b720adeb17ce19813"
+    },
+    "sources.json": {
+      "size": 6143,
+      "sha256": "683e699bd18f659c3ead6503bbe953841654dd57687efe7a1f284b515a5b1f89"
+    }
+  },
+  "audit": {
+    "status": "passed",
+    "manifest_sha256": "86249269ff07e2b31ebbd4641784d75de1557966fe4bfaa377a7a8c4c2dbc5ac",
+    "manifest_name": "artifact-manifest.json",
+    "scope": "upstream-with-verified-repairs",
+    "repair_overlay": {
+      "manifest_sha256": "4f3046cd66ceff7fded1882be629a3a0975dc03b868f2b345cc8f58dac5f62fc",
+      "registered": 175,
+      "applied": 175,
+      "verified": 175,
+      "tree_verification_scope": "original_upstream_archive_only"
+    },
+    "release_asset": "audit-rules-39182335536-1-v2.tar.gz"
+  },
+  "counts": {
+    "meta/geosite/private": 133,
+    "meta/geosite/geolocation-cn": 5388,
+    "meta/geosite/google": 1077,
+    "meta/geosite/youtube": 178,
+    "meta/geosite/telegram": 21,
+    "meta/geosite/netflix": 28,
+    "meta/geosite/github": 65,
+    "meta/geosite/openai": 24,
+    "meta/geoip/private": 18,
+    "meta/geoip/cn": 10009,
+    "meta/geoip/telegram": 12,
+    "personal/direct": 3
+  },
+  "provider_counts": {
+    "cn-domain": 5323,
+    "cn-ipcidr": 10009,
+    "personal-direct-domain": 3,
+    "private-domain": 132,
+    "private-ipcidr": 18,
+    "services-proxy": 973,
+    "telegram-ipcidr": 12
+  },
+  "distribution_license": "GPL-3.0; audited ACL originals retain CC-BY-SA-4.0"
+}
