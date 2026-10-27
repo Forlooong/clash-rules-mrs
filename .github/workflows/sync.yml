@@ -1,4 +1,5 @@
 name: Sync and Build MRS Rulesets
+# Refresh workflow discovery on the fork; triggers and build logic unchanged.
 
 on:
   schedule:
